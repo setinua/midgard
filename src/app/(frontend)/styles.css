@@ -125,6 +125,9 @@ figcaption { font: 400 13px/18px var(--sans); color: var(--ink-600); margin-top:
 .prose p { margin: 0 0 20px; }
 .prose h2 { font: 700 24px/30px var(--serif); color: var(--blue-600); margin: 32px 0 12px; }
 .prose h3 { font: 700 19px/25px var(--serif); margin: 28px 0 10px; }
+.prose h4 { font: 700 17px/24px var(--sans); margin: 24px 0 8px; }
+.prose hr { border: 0; border-top: 1px solid var(--line, #d6dde8); margin: 32px 0; }
+.prose li { margin: 0 0 8px; }
 .prose a { color: var(--blue-600); text-decoration: underline; }
 .prose blockquote { margin: 28px 0; padding: 4px 0 4px 20px; border-left: 3px solid var(--bronze-400); font: 600 22px/30px var(--serif); color: var(--navy-800); }
 .prose ul, .prose ol { padding-left: 24px; margin: 0 0 20px; }

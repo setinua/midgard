@@ -1,6 +1,6 @@
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { resendAdapter } from '@payloadcms/email-resend'
-import { FixedToolbarFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
+import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
 import { s3Storage } from '@payloadcms/storage-s3'
 import { uk } from '@payloadcms/translations/languages/uk'
 import path from 'path'
@@ -36,7 +36,14 @@ export default buildConfig({
   globals: [Homepage, Settings],
   editor: lexicalEditor({
     // Always-visible toolbar above the text (bold, link, quote, lists, headings, upload)
-    features: ({ defaultFeatures }) => [...defaultFeatures, FixedToolbarFeature()],
+    // H1 is the article title, so the body only gets H2–H4; rarely needed tools are removed.
+    features: ({ defaultFeatures }) => [
+      ...defaultFeatures.filter(
+        (f) => !['heading', 'relationship', 'checklist', 'subscript', 'superscript', 'inlineCode'].includes(f.key),
+      ),
+      HeadingFeature({ enabledHeadingSizes: ['h2', 'h3', 'h4'] }),
+      FixedToolbarFeature(),
+    ],
   }),
   secret: env.PAYLOAD_SECRET || '',
   typescript: { outputFile: path.resolve(dirname, 'payload-types.ts') },
