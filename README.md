@@ -29,8 +29,8 @@ npm run dev
 
 ## Тестовий вміст
 
-`npx payload run src/seed/demo.ts` — створює тестові матеріали (тег «тест»).
-`npx payload run src/seed/demo.ts --remove` — видаляє їх. Перед запуском сайту — обов'язково видалити.
+`npx payload run src/seed/demo-cli.ts` — створює тестові матеріали (тег «тест»).
+`SEED_DEMO=remove npx payload run src/seed/demo-cli.ts` — видаляє їх. Перед запуском сайту — обов'язково видалити.
 
 ## Деплой
 

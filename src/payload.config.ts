@@ -18,6 +18,7 @@ import { Homepage } from './globals/Homepage'
 import { Settings } from './globals/Settings'
 import { migrations } from './migrations'
 import { seedBase } from './seed/base'
+import { demoSeed } from './seed/demo'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -62,5 +63,9 @@ export default buildConfig({
   ],
   onInit: async (payload) => {
     await seedBase(payload)
+    const demo = process.env.SEED_DEMO
+    if (demo === '1' || demo === 'remove') {
+      demoSeed(payload, demo === 'remove').catch((e) => payload.logger.error(e))
+    }
   },
 })

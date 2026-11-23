@@ -2,13 +2,16 @@
 // Test content for the closed test site ONLY. Every item is tagged «тест» so it can be removed before launch:
 //   npx payload run src/seed/demo.ts           — create
 //   npx payload run src/seed/demo.ts --remove  — delete all test items
-import { getPayload } from 'payload'
+// On the server: set SEED_DEMO=1 (create, once) or SEED_DEMO=remove in Railway variables and redeploy.
 import sharp from 'sharp'
-import config from '../payload.config'
 
-const payload = await getPayload({ config })
-const remove = process.argv.includes('--remove')
-
+export async function demoSeed(payload, remove = false) {
+const existing = (await payload.find({ collection: 'tags', where: { slug: { equals: 'test' } }, limit: 1 })).docs[0]
+if (!remove && existing) {
+  const count = await payload.count({ collection: 'articles', where: { tags: { in: [existing.id] } } })
+  if (count.totalDocs > 0) { payload.logger.info('Demo content already exists, skipping'); return }
+}
+if (remove && !existing) return
 const tag =
   (await payload.find({ collection: 'tags', where: { slug: { equals: 'test' } }, limit: 1 })).docs[0] ||
   (await payload.create({ collection: 'tags', data: { name: 'тест', slug: 'test' } }))
@@ -21,8 +24,8 @@ if (remove) {
   const authors = await payload.find({ collection: 'authors', where: { bio: { like: '[тестовий автор]' } }, limit: 100 })
   for (const a of authors.docs) await payload.delete({ collection: 'authors', id: a.id })
   await payload.delete({ collection: 'tags', id: tag.id })
-  console.log('Test content removed')
-  process.exit(0)
+  payload.logger.info('Test content removed')
+  return
 }
 
 const tones = ['#cbbba0', '#b7a486', '#a9b4bf', '#c9b48f', '#9fae9a', '#bfa48a']
@@ -92,5 +95,5 @@ await payload.updateGlobal({
   slug: 'homepage',
   data: { textOfDay: ids.publication[0], mainToday: [...ids.publication.slice(1), ...ids.special, ...ids.column.slice(0, 2)].slice(0, 10), popular: [...ids.publication.slice(2, 4), ...ids.special.slice(0, 3)] },
 })
-console.log(`Created ${n} test articles`)
-process.exit(0)
+payload.logger.info(`Created ${n} test articles`)
+}
