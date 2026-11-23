@@ -11,7 +11,7 @@ export const Settings: GlobalConfig = {
     {
       name: 'social',
       type: 'array',
-      label: 'Соцмережі',
+      label: 'Соцмережі', labels: { singular: 'соцмережу', plural: 'Соцмережі' },
       fields: [
         { name: 'network', type: 'select', required: true, options: ['facebook', 'telegram', 'youtube', 'instagram', 'x'], label: 'Мережа' },
         { name: 'url', type: 'text', required: true, label: 'Посилання' },

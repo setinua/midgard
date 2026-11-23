@@ -18,7 +18,7 @@ export const Authors: CollectionConfig = {
     {
       name: 'links',
       type: 'array',
-      label: 'Профілі та соцмережі',
+      label: 'Профілі та соцмережі', labels: { singular: 'посилання', plural: 'Профілі та соцмережі' },
       fields: [
         { name: 'label', type: 'text', required: true, label: 'Назва' },
         { name: 'url', type: 'text', required: true, label: 'Посилання' },

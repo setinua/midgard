@@ -33,7 +33,7 @@ export const Articles: CollectionConfig = {
             {
               name: 'sources',
               type: 'array',
-              label: 'Джерела',
+              label: 'Джерела', labels: { singular: 'джерело', plural: 'Джерела' },
               admin: { description: 'Обов’язково для новин.' },
               fields: [
                 { name: 'title', type: 'text', required: true, label: 'Назва джерела' },
