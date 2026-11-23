@@ -5,6 +5,18 @@ export const Users: CollectionConfig = {
   slug: 'users',
   labels: { singular: 'Користувач', plural: 'Користувачі' },
   admin: { useAsTitle: 'email', group: 'Налаштування', defaultColumns: ['email', 'name', 'role'] },
+  hooks: {
+    // The very first account (created on /admin/create-first-user) is always an administrator.
+    beforeChange: [
+      async ({ data, operation, req }) => {
+        if (operation === 'create') {
+          const { totalDocs } = await req.payload.count({ collection: 'users', req })
+          if (totalDocs === 0) data.role = 'admin'
+        }
+        return data
+      },
+    ],
+  },
   auth: { maxLoginAttempts: 5, lockTime: 15 * 60 * 1000 },
   access: {
     read: isLoggedIn,

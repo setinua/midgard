@@ -63,6 +63,15 @@ export default buildConfig({
   ],
   onInit: async (payload) => {
     await seedBase(payload)
+    // Safety net: if no administrator exists, promote the oldest account.
+    const admins = await payload.count({ collection: 'users', where: { role: { equals: 'admin' } } })
+    if (admins.totalDocs === 0) {
+      const first = (await payload.find({ collection: 'users', sort: 'createdAt', limit: 1, depth: 0 })).docs[0]
+      if (first) {
+        await payload.update({ collection: 'users', id: first.id, data: { role: 'admin' } })
+        payload.logger.info(`Promoted ${first.email} to admin (no admin existed)`)
+      }
+    }
     const demo = process.env.SEED_DEMO
     if (demo === '1' || demo === 'remove') {
       demoSeed(payload, demo === 'remove').catch((e) => payload.logger.error(e))
