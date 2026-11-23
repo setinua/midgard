@@ -1,6 +1,6 @@
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { resendAdapter } from '@payloadcms/email-resend'
-import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import { FixedToolbarFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
 import { s3Storage } from '@payloadcms/storage-s3'
 import { uk } from '@payloadcms/translations/languages/uk'
 import path from 'path'
@@ -34,7 +34,10 @@ export default buildConfig({
   i18n: { supportedLanguages: { uk }, fallbackLanguage: 'uk' },
   collections: [Articles, Pages, Authors, Media, Regions, Epochs, Tags, Users],
   globals: [Homepage, Settings],
-  editor: lexicalEditor(),
+  editor: lexicalEditor({
+    // Always-visible toolbar above the text (bold, link, quote, lists, headings, upload)
+    features: ({ defaultFeatures }) => [...defaultFeatures, FixedToolbarFeature()],
+  }),
   secret: env.PAYLOAD_SECRET || '',
   typescript: { outputFile: path.resolve(dirname, 'payload-types.ts') },
   db: postgresAdapter({
