@@ -124,14 +124,21 @@ export default async function ArticlePage({ params }: Props) {
       )}
       <Prose data={a.content} />
       {a.sources && a.sources.length > 0 && (
-        <aside className="source">
-          <Icon.info />
-          <span>
-            {a.sources.length > 1 ? 'Джерела: ' : 'Джерело: '}
-            {a.sources.map((s, i) => (
-              <span key={s.id || i}>{i > 0 && '; '}{s.url ? <a href={s.url} target="_blank" rel={t.value === 'partner' ? 'sponsored noopener' : 'noopener'}>{s.title}</a> : s.title}</span>
-            ))}
-          </span>
+        <aside className="sources" aria-labelledby="sources-h">
+          <h2 id="sources-h" className="sources-h">{a.sources.length > 1 ? 'Джерела' : 'Джерело'}</h2>
+          <ol>
+            {a.sources.map((s, i) => {
+              const title = s.title.trim().replace(/[\s.;,]+$/, '')
+              let host = ''
+              try { if (s.url) host = new URL(s.url).hostname.replace(/^www\./, '') } catch {}
+              return (
+                <li key={s.id || i}>
+                  {s.url ? <a href={s.url} target="_blank" rel={t.value === 'partner' ? 'sponsored noopener' : 'noopener'}>{title}</a> : title}
+                  {host && <span className="sources-host">{host}</span>}
+                </li>
+              )
+            })}
+          </ol>
         </aside>
       )}
       {(tags.length > 0 || extraRegions.length > 0 || extraEpochs.length > 0) && (
