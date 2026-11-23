@@ -9,7 +9,7 @@
 | --- | --- |
 | `DATABASE_URL` | Postgres |
 | `PAYLOAD_SECRET` | секрет сесій адмінки (довгий випадковий рядок) |
-| `NEXT_PUBLIC_SERVER_URL` | повна адреса сайту, напр. `https://midgard.set.in.ua` |
+| `SERVER_URL` | повна адреса сайту, напр. `https://midgard.set.in.ua` |
 | `S3_BUCKET`, `S3_ENDPOINT`, `S3_REGION`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` | сховище фото (Railway Bucket або будь-яке S3) |
 | `SITE_PASSWORD`, `SITE_USER` | тестовий етап: сайт закритий паролем (basic auth) |
 | `SITE_NOINDEX=1` | тестовий етап: заборона індексації |

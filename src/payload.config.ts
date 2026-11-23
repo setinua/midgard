@@ -24,7 +24,7 @@ const dirname = path.dirname(filename)
 const env = process.env
 
 export default buildConfig({
-  serverURL: env.NEXT_PUBLIC_SERVER_URL || '',
+  serverURL: env.SERVER_URL || '',
   admin: {
     user: Users.slug,
     meta: { titleSuffix: ' — Мідгард' },

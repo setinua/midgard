@@ -39,5 +39,5 @@ export const EPOCHS = [
 
 export const SITE_NAME = 'Мідгард'
 export const SITE_TAGLINE = 'Загублений світ людей'
-export const SITE_URL = (process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000').replace(/\/$/, '')
+export const SITE_URL = (process.env.SERVER_URL || 'http://localhost:3000').replace(/\/$/, '')
 export const PAGE_SIZE = 12
