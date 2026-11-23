@@ -2,18 +2,22 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Crumbs } from '../../../components/ListPage'
 import { sql } from '@payloadcms/db-postgres'
-import { payload } from '../../../lib/data'
+import { cached, payload } from '../../../lib/data'
 
 export const metadata: Metadata = { title: 'Архів' }
 const MONTHS = ['січень', 'лютий', 'березень', 'квітень', 'травень', 'червень', 'липень', 'серпень', 'вересень', 'жовтень', 'листопад', 'грудень']
 
-export default async function Archive() {
+// Group published materials by year and month (Kyiv time).
+const getMonths = cached('archiveMonths', async () => {
   const p = await payload()
-  // Group published materials by year and month (Kyiv time).
   const res = await (p.db as any).drizzle.execute(
     sql`select extract(year from published_at at time zone 'Europe/Kyiv')::int as y, extract(month from published_at at time zone 'Europe/Kyiv')::int as m, count(*)::int as n from articles where _status = 'published' and published_at <= now() group by 1, 2 order by 1 desc, 2 desc`,
   )
-  const rows = ((res as any).rows || res) as { y: number; m: number; n: number }[]
+  return ((res as any).rows || res) as { y: number; m: number; n: number }[]
+})
+
+export default async function Archive() {
+  const rows = await getMonths()
   const years = [...new Set(rows.map((r) => r.y))]
   return (
     <div className="wrap page" style={{ paddingTop: 20 }}>

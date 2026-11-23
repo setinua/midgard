@@ -5,7 +5,12 @@ import { Img } from '../../../components/Img'
 import { Crumbs, ListPage, pageNoindex, type SP } from '../../../components/ListPage'
 import { Prose } from '../../../components/Prose'
 import { SITE_URL, typeByPath } from '../../../lib/constants'
-import { bySlug, img, payload, type Author } from '../../../lib/data'
+import { bySlug, cached, img, payload, type Author } from '../../../lib/data'
+
+const getTeam = cached('team', async () => {
+  const p = await payload()
+  return (await p.find({ collection: 'authors', where: { inTeam: { equals: true } }, sort: 'order', limit: 100, depth: 1 })).docs as Author[]
+})
 
 type Props = { params: Promise<{ section: string }>; searchParams: Promise<SP> }
 
@@ -38,8 +43,7 @@ export default async function Section({ params, searchParams }: Props) {
   if (!page) notFound()
   let team: Author[] = []
   if (section === 'komanda') {
-    const p = await payload()
-    team = (await p.find({ collection: 'authors', where: { inTeam: { equals: true } }, sort: 'order', limit: 100, depth: 1 })).docs as Author[]
+    team = await getTeam()
   }
   return (
     <div className="wrap page" style={{ paddingTop: 20 }}>

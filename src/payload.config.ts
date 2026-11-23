@@ -16,6 +16,7 @@ import { Epochs, Regions, Tags } from './collections/Taxonomies'
 import { Users } from './collections/Users'
 import { Homepage } from './globals/Homepage'
 import { Settings } from './globals/Settings'
+import { purgeOnChange, purgeOnGlobalChange } from './lib/revalidate'
 import { migrations } from './migrations'
 import { seedBase } from './seed/base'
 import { demoSeed } from './seed/demo'
@@ -32,8 +33,9 @@ export default buildConfig({
     importMap: { baseDir: path.resolve(dirname) },
   },
   i18n: { supportedLanguages: { uk }, fallbackLanguage: 'uk' },
-  collections: [Articles, Pages, Authors, Media, Regions, Epochs, Tags, Users],
-  globals: [Homepage, Settings],
+  // Users are left out: they never appear on the public site.
+  collections: [...[Articles, Pages, Authors, Media, Regions, Epochs, Tags].map(purgeOnChange), Users],
+  globals: [Homepage, Settings].map(purgeOnGlobalChange),
   editor: lexicalEditor({
     // Always-visible toolbar above the text (bold, link, quote, lists, headings, upload)
     // H1 is the article title, so the body only gets H2–H4; rarely needed tools are removed.

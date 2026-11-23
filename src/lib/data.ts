@@ -1,5 +1,6 @@
 import 'server-only'
 import config from '@payload-config'
+import { unstable_cache } from 'next/cache'
 import { draftMode } from 'next/headers'
 import { cache } from 'react'
 import { getPayload, type Where } from 'payload'
@@ -7,6 +8,13 @@ import type { Article, Author, Epoch, Media, Region, Tag } from '../payload-type
 import { PAGE_SIZE, typeByValue } from './constants'
 
 export const payload = cache(async () => getPayload({ config }))
+
+// Site content is cached between requests under one tag. Any change in the admin
+// purges it (see lib/revalidate.ts); the 60 s lifetime also picks up scheduled posts.
+export const CONTENT_TAG = 'content'
+export const cached = <A extends unknown[], R>(name: string, fn: (...args: A) => Promise<R>) =>
+  (...args: A): Promise<R> =>
+    unstable_cache(() => fn(...args), [name, JSON.stringify(args)], { tags: [CONTENT_TAG], revalidate: 60 })()
 
 const published: Where = { _status: { equals: 'published' } }
 const live = (): Where => ({ and: [published, { publishedAt: { less_than_equal: new Date().toISOString() } }] })
@@ -34,12 +42,12 @@ export const rel = <T,>(v: unknown): T | null => (v && typeof v === 'object' ? (
 export const authorNames = (a: Pick<Article, 'authors' | 'byline'>) =>
   (a.authors || []).map((x) => rel<Author>(x)?.name).filter(Boolean).join(', ') || a.byline || ''
 
-export async function findArticles(opts: {
+export const findArticles = cached('findArticles', async (opts: {
   where?: Where[]
   limit?: number
   page?: number
   exclude?: number[]
-}): Promise<{ docs: Card[]; totalPages: number; totalDocs: number }> {
+}): Promise<{ docs: Card[]; totalPages: number; totalDocs: number }> => {
   const p = await payload()
   const and: Where[] = [live(), ...(opts.where || [])]
   if (opts.exclude?.length) and.push({ id: { not_in: opts.exclude } })
@@ -53,7 +61,7 @@ export async function findArticles(opts: {
     select: CARD,
   })
   return { docs: res.docs as Card[], totalPages: res.totalPages, totalDocs: res.totalDocs }
-}
+})
 
 // Keeps only published, already-live picks from a manual list, in editor order.
 const livePicks = (list: unknown[] | null | undefined): Card[] => {
@@ -63,7 +71,7 @@ const livePicks = (list: unknown[] | null | undefined): Card[] => {
     .filter((a): a is Article => !!a && a._status === 'published' && new Date(a.publishedAt).getTime() <= now) as Card[]
 }
 
-export const getHomepage = cache(async () => {
+export const getHomepage = cache(cached('homepage', async () => {
   const p = await payload()
   const home = await p.findGlobal({ slug: 'homepage', depth: 2 })
   const textOfDay = livePicks([home.textOfDay])[0] || null
@@ -86,11 +94,15 @@ export const getHomepage = cache(async () => {
     findArticles({ where: [{ type: { equals: 'partner' } }], limit: 6 }).then((r) => r.docs),
   ])
   return { textOfDay, news: news.docs, main, publications, columns, specials, partners, popular: livePicks(home.popular).slice(0, 5) }
-})
+}))
 
 export async function getArticle(typeValue: string, slug: string) {
-  const p = await payload()
   const { isEnabled: draft } = await draftMode()
+  return draft ? queryArticle(typeValue, slug, true) : cachedArticle(typeValue, slug, false)
+}
+
+async function queryArticle(typeValue: string, slug: string, draft: boolean) {
+  const p = await payload()
   const res = await p.find({
     collection: 'articles',
     where: { and: [{ slug: { equals: slug } }, { type: { equals: typeValue } }, ...(draft ? [] : [live()])] },
@@ -101,6 +113,7 @@ export async function getArticle(typeValue: string, slug: string) {
   })
   return res.docs[0] || null
 }
+const cachedArticle = cached('article', queryArticle)
 
 export async function getRelated(a: Article): Promise<Card[]> {
   const manual = livePicks(a.related).slice(0, 4)
@@ -123,21 +136,24 @@ export async function getSidebar(excludeId?: number) {
   return { news: news.docs, popular: home.popular.filter((x) => x.id !== excludeId) }
 }
 
-export const getTaxonomy = cache(async () => {
+export const getTaxonomy = cache(cached('taxonomy', async () => {
   const p = await payload()
   const [regions, epochs] = await Promise.all([
     p.find({ collection: 'regions', sort: 'order', limit: 20, depth: 0 }),
     p.find({ collection: 'epochs', sort: 'order', limit: 30, depth: 0 }),
   ])
   return { regions: regions.docs as Region[], epochs: epochs.docs as Epoch[] }
-})
+}))
 
-export const getSettings = cache(async () => (await payload()).findGlobal({ slug: 'settings', depth: 0 }))
+export const getSettings = cache(cached('settings', async () => (await payload()).findGlobal({ slug: 'settings', depth: 0 })))
 
-export async function bySlug<T extends 'regions' | 'epochs' | 'tags' | 'authors' | 'pages'>(collection: T, slug: string) {
+async function queryBySlug<T extends 'regions' | 'epochs' | 'tags' | 'authors' | 'pages'>(collection: T, slug: string) {
   const p = await payload()
   const res = await p.find({ collection, where: { slug: { equals: slug } }, limit: 1, depth: 1 })
   return res.docs[0] || null
 }
+const cachedBySlug = cached('bySlug', queryBySlug as (collection: string, slug: string) => Promise<unknown>)
+export const bySlug = <T extends 'regions' | 'epochs' | 'tags' | 'authors' | 'pages'>(collection: T, slug: string) =>
+  cachedBySlug(collection, slug) as ReturnType<typeof queryBySlug<T>>
 
 export type { Article, Author, Epoch, Media, Region, Tag }
