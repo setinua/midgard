@@ -224,9 +224,9 @@ export interface Media {
   caption?: string | null;
   credit: string;
   /**
-   * Напр.: CC BY 4.0, власне фото, з дозволу автора.
+   * На яких умовах можна використати фото: «власне фото», «з дозволу автора», «CC BY 4.0», «прес-реліз музею». Допомагає уникнути претензій щодо авторських прав.
    */
-  license: string;
+  license?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;

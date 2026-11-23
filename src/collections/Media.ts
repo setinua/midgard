@@ -22,7 +22,12 @@ export const Media: CollectionConfig = {
     { name: 'alt', type: 'text', required: true, label: 'Альтернативний текст (що зображено)' },
     { name: 'caption', type: 'text', label: 'Підпис' },
     { name: 'credit', type: 'text', required: true, label: 'Автор / джерело' },
-    { name: 'license', type: 'text', required: true, label: 'Ліцензія', admin: { description: 'Напр.: CC BY 4.0, власне фото, з дозволу автора.' } },
+    {
+      name: 'license',
+      type: 'text',
+      label: 'Ліцензія / дозвіл (необов’язково)',
+      admin: { description: 'На яких умовах можна використати фото: «власне фото», «з дозволу автора», «CC BY 4.0», «прес-реліз музею». Допомагає уникнути претензій щодо авторських прав.' },
+    },
   ],
   hooks: {
     beforeChange: [
