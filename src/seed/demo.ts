@@ -1,7 +1,7 @@
 // @ts-nocheck — one-off script for test content
 // Test content for the closed test site ONLY. Every item is tagged «тест» so it can be removed before launch:
 //   npx payload run src/seed/demo.ts           — create
-//   npx payload run src/seed/demo.ts --remove  — delete all test items
+//   npx payload run src/seed/demo.ts --remove  — delete test articles, the tag and unused test images (authors stay)
 // On the server: set SEED_DEMO=1 (create, once) or SEED_DEMO=remove in Railway variables and redeploy.
 import sharp from 'sharp'
 
@@ -17,12 +17,19 @@ const tag =
   (await payload.create({ collection: 'tags', data: { name: 'тест', slug: 'test' } }))
 
 if (remove) {
-  const arts = await payload.find({ collection: 'articles', where: { tags: { in: [tag.id] } }, limit: 1000, depth: 0 })
+  // Test articles and the «тест» tag go; test authors stay (real articles are signed by them),
+  // and so do test images still used by an author or a remaining article.
+  const arts = await payload.find({ collection: 'articles', where: { tags: { in: [tag.id] } }, limit: 1000, depth: 0, draft: true })
   for (const a of arts.docs) await payload.delete({ collection: 'articles', id: a.id })
-  const media = await payload.find({ collection: 'media', where: { license: { equals: 'тестове зображення' } }, limit: 1000 })
-  for (const m of media.docs) await payload.delete({ collection: 'media', id: m.id })
-  const authors = await payload.find({ collection: 'authors', where: { bio: { like: '[тестовий автор]' } }, limit: 100 })
-  for (const a of authors.docs) await payload.delete({ collection: 'authors', id: a.id })
+  const authors = await payload.find({ collection: 'authors', limit: 1000, depth: 0 })
+  const rest = await payload.find({ collection: 'articles', limit: 10000, depth: 0, draft: true })
+  const used = new Set(authors.docs.map((a) => a.photo).filter(Boolean))
+  const restJson = JSON.stringify(rest.docs)
+  const media = await payload.find({ collection: 'media', where: { license: { equals: 'тестове зображення' } }, limit: 1000, depth: 0 })
+  for (const m of media.docs) {
+    if (used.has(m.id) || rest.docs.some((a) => a.hero === m.id) || restJson.includes(`"value":${m.id}`)) continue
+    await payload.delete({ collection: 'media', id: m.id })
+  }
   await payload.delete({ collection: 'tags', id: tag.id })
   payload.logger.info('Test content removed')
   return
