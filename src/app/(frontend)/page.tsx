@@ -1,59 +1,76 @@
-import { headers as getHeaders } from 'next/headers.js'
-import Image from 'next/image'
-import { getPayload } from 'payload'
-import React from 'react'
-import { fileURLToPath } from 'url'
+import Link from 'next/link'
+import { AdLabel, Empty, NewsList, SectionHead, ThumbList, metaLine } from '../../components/Blocks'
+import { Img } from '../../components/Img'
+import { getHomepage, href, img, rel, type Epoch, type Region } from '../../lib/data'
+import { smart } from '../../lib/format'
 
-import config from '@/payload.config'
-import './styles.css'
-
-export default async function HomePage() {
-  const headers = await getHeaders()
-  const payloadConfig = await config
-  const payload = await getPayload({ config: payloadConfig })
-  const { user } = await payload.auth({ headers })
-
-  const fileURL = `vscode://file/${fileURLToPath(import.meta.url)}`
+export default async function Home() {
+  const h = await getHomepage()
+  const lead = h.textOfDay
+  const kicker = lead ? [rel<Epoch>(lead.primaryEpoch)?.name, rel<Region>(lead.primaryRegion)?.name].filter(Boolean).join(' · ') : ''
 
   return (
-    <div className="home">
-      <div className="content">
-        <picture>
-          <source srcSet="https://raw.githubusercontent.com/payloadcms/payload/3.x/packages/ui/src/assets/payload-favicon.svg" />
-          <Image
-            alt="Payload Logo"
-            height={65}
-            src="https://raw.githubusercontent.com/payloadcms/payload/3.x/packages/ui/src/assets/payload-favicon.svg"
-            width={65}
-          />
-        </picture>
-        {!user && <h1>Welcome to your new project.</h1>}
-        {user && <h1>Welcome back, {user.email}</h1>}
-        <div className="links">
-          <a
-            className="admin"
-            href={payloadConfig.routes.admin}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Go to admin panel
-          </a>
-          <a
-            className="docs"
-            href="https://payloadcms.com/docs"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Documentation
-          </a>
+    <div className="wrap page stack-48">
+      <h1 className="sr-only">Мідгард — археологічне медіа</h1>
+      <section className="t1">
+        <div>
+          <SectionHead title="Останні новини" />
+          <NewsList items={h.news} />
+          <Link href="/novyny" className="more more-block">Усі новини →</Link>
         </div>
-      </div>
-      <div className="footer">
-        <p>Update this page by editing</p>
-        <a className="codeLink" href={fileURL}>
-          <code>app/(frontend)/page.tsx</code>
-        </a>
-      </div>
+        <article className="c-lead lead-card">
+          <SectionHead title="Текст дня" />
+          {lead ? (
+            <Link href={href(lead)} style={{ display: 'block' }}>
+              <Img media={img(lead.hero)} size="lead" className="lead-img" sizes="(max-width: 767px) 100vw, 600px" priority />
+              {kicker && <div className="kicker" style={{ margin: '18px 0 8px' }}>{kicker}</div>}
+              <h2 className="lc-title">{lead.title}</h2>
+              <p className="lc-lead">{lead.lead}</p>
+              <div className="meta">{metaLine(lead)}</div>
+            </Link>
+          ) : (
+            <Empty>Редактор ще не обрав «Текст дня».</Empty>
+          )}
+        </article>
+        <div>
+          <SectionHead title="Головне сьогодні" />
+          {h.main.length ? <ThumbList items={h.main} /> : <Empty>Поки немає матеріалів.</Empty>}
+        </div>
+      </section>
+
+      <section className="t2" aria-label="Публікації, колонки, спецпроєкти">
+        {(
+          [
+            ['Публікації', '/publikatsii', h.publications, false],
+            ['Колонки', '/kolonky', h.columns, true],
+            ['Спецпроєкти', '/spetsproiekty', h.specials, false],
+          ] as const
+        )
+          .filter(([, , items]) => items.length)
+          .map(([title, url, items, isCol]) => (
+            <div key={url}>
+              <SectionHead title={title} more={{ href: url, label: 'Усі →' }} />
+              <ThumbList items={items} size={96} small={false} withAuthor={isCol} avatar={isCol} />
+            </div>
+          ))}
+      </section>
+
+      {h.partners.length > 0 && (
+        <section>
+          <SectionHead title="Партнерські матеріали" />
+          <div className="pt">
+            {h.partners.map((p) => (
+              <Link key={p.id} href={href(p)} className="li" style={{ gap: 16 }}>
+                <Img media={img(p.hero)} size="thumb" className="th-120" sizes="120px" />
+                <span style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <span className="meta" style={{ display: 'flex', gap: 10, alignItems: 'center' }}>{smart(p.publishedAt)} <AdLabel /></span>
+                  <span className="h-card">{p.title}</span>
+                </span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   )
 }
