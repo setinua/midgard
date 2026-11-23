@@ -136,10 +136,10 @@ figcaption { font: 400 13px/18px var(--sans); color: var(--ink-600); margin-top:
 .prose td, .prose th { border: 1px solid var(--line); padding: 8px 10px; text-align: left; }
 .sources { max-width: 68ch; margin: 8px 0 24px; padding-top: 12px; border-top: 1px solid var(--line); }
 .sources-h { font: 600 13px/16px var(--sans); text-transform: uppercase; letter-spacing: .06em; color: var(--ink-500); margin: 0 0 8px; }
-.sources ol { margin: 0; padding: 0; list-style: none; counter-reset: src; }
-.sources li { counter-increment: src; position: relative; padding-left: 22px; font: 400 14px/20px var(--sans); color: var(--ink-600); }
+.sources ul { margin: 0; padding: 0; list-style: none; }
+.sources li { position: relative; padding-left: 16px; font: 400 14px/20px var(--sans); color: var(--ink-600); }
 .sources li + li { margin-top: 6px; }
-.sources li::before { content: counter(src) "."; position: absolute; left: 0; color: var(--ink-500); font-variant-numeric: tabular-nums; }
+.sources li::before { content: ""; position: absolute; left: 2px; top: 8px; width: 5px; height: 5px; border-radius: 50%; background: var(--ink-500); }
 .sources a { color: var(--ink-900); text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; }
 .sources a:hover { color: var(--blue-600); text-decoration-color: currentColor; }
 .sources-host { margin-left: 6px; font-size: 13px; color: var(--ink-500); white-space: nowrap; }

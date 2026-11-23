@@ -126,7 +126,7 @@ export default async function ArticlePage({ params }: Props) {
       {a.sources && a.sources.length > 0 && (
         <aside className="sources" aria-labelledby="sources-h">
           <h2 id="sources-h" className="sources-h">{a.sources.length > 1 ? 'Джерела' : 'Джерело'}</h2>
-          <ol>
+          <ul>
             {a.sources.map((s, i) => {
               const title = s.title.trim().replace(/[\s.;,]+$/, '')
               let host = ''
@@ -138,7 +138,7 @@ export default async function ArticlePage({ params }: Props) {
                 </li>
               )
             })}
-          </ol>
+          </ul>
         </aside>
       )}
       {(tags.length > 0 || extraRegions.length > 0 || extraEpochs.length > 0) && (
