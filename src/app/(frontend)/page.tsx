@@ -35,6 +35,12 @@ export default async function Home() {
         <div>
           <SectionHead title="Головне сьогодні" />
           {h.main.length ? <ThumbList items={h.main} /> : <Empty>Поки немає матеріалів.</Empty>}
+          {h.popular.length > 0 && (
+            <div style={{ marginTop: 32 }}>
+              <SectionHead title="Популярні" />
+              <ThumbList items={h.popular} />
+            </div>
+          )}
         </div>
       </section>
 

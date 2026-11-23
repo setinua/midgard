@@ -78,8 +78,19 @@ export const getHomepage = cache(cached('homepage', async () => {
   const used = textOfDay ? [textOfDay.id] : []
 
   const news = await findArticles({ where: [{ type: { equals: 'news' } }], limit: home.newsCount || 12 })
-  let main = livePicks(home.mainToday).filter((a) => !used.includes(a.id))
-  if (main.length === 0) main = (await findArticles({ limit: 10, exclude: [...used, ...news.docs.map((n) => n.id)], where: [{ type: { not_in: ['partner'] } }] })).docs
+  // «Головне сьогодні»: editor's picks in their order, topped up with the newest materials to the same count as the
+  // news column (10–15), so a single pick no longer leaves the column almost empty. «Популярні» are not repeated here.
+  const popular = livePicks(home.popular).slice(0, 5)
+  const target = home.newsCount || 12
+  let main = livePicks(home.mainToday).filter((a) => !used.includes(a.id)).slice(0, target)
+  if (main.length < target) {
+    const more = await findArticles({
+      limit: target - main.length,
+      exclude: [...used, ...main.map((m) => m.id), ...news.docs.map((n) => n.id), ...popular.map((x) => x.id)],
+      where: [{ type: { not_in: ['partner'] } }],
+    })
+    main = [...main, ...more.docs]
+  }
 
   const fill = async (pins: unknown[] | null | undefined, type: string) => {
     const picked = livePicks(pins)
@@ -93,7 +104,7 @@ export const getHomepage = cache(cached('homepage', async () => {
     fill(home.pinnedSpecials, 'special'),
     findArticles({ where: [{ type: { equals: 'partner' } }], limit: 6 }).then((r) => r.docs),
   ])
-  return { textOfDay, news: news.docs, main, publications, columns, specials, partners, popular: livePicks(home.popular).slice(0, 5) }
+  return { textOfDay, news: news.docs, main, publications, columns, specials, partners, popular }
 }))
 
 export async function getArticle(typeValue: string, slug: string) {
