@@ -1,6 +1,6 @@
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { resendAdapter } from '@payloadcms/email-resend'
-import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
+import { BlocksFeature, FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
 import { s3Storage } from '@payloadcms/storage-s3'
 import { uk } from '@payloadcms/translations/languages/uk'
 import path from 'path'
@@ -42,6 +42,27 @@ export default buildConfig({
         (f) => !['heading', 'relationship', 'checklist', 'subscript', 'superscript', 'inlineCode'].includes(f.key),
       ),
       HeadingFeature({ enabledHeadingSizes: ['h2', 'h3', 'h4'] }),
+      // Raw HTML block for embeds (YouTube, maps, tables, social posts) — inserted via «+» → «HTML-код»
+      BlocksFeature({
+        blocks: [
+          {
+            slug: 'html',
+            labels: { singular: 'HTML-код', plural: 'HTML-код' },
+            fields: [
+              {
+                name: 'html',
+                type: 'code',
+                label: 'HTML-код',
+                required: true,
+                admin: {
+                  language: 'html',
+                  description: 'Вставте код вбудовування (YouTube, Google Maps, Instagram, X, таблиця тощо). На сайті він покажеться як є.',
+                },
+              },
+            ],
+          },
+        ],
+      }),
       FixedToolbarFeature(),
     ],
   }),

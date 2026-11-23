@@ -1,6 +1,7 @@
 import { LinkJSXConverter, RichText, type JSXConvertersFunction } from '@payloadcms/richtext-lexical/react'
 import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical'
 import { typeByValue } from '../lib/constants'
+import { HtmlEmbed } from './HtmlEmbed'
 
 const internal = ({ linkNode }: any) => {
   const doc = linkNode?.fields?.doc
@@ -14,6 +15,9 @@ const internal = ({ linkNode }: any) => {
 const converters: JSXConvertersFunction = ({ defaultConverters }) => ({
   ...defaultConverters,
   ...LinkJSXConverter({ internalDocToHref: internal }),
+  blocks: {
+    html: ({ node }: any) => (node.fields?.html ? <HtmlEmbed html={node.fields.html} /> : null),
+  },
   upload: ({ node }: any) => {
     const m = node.value
     if (!m || typeof m !== 'object' || !m.url) return null
