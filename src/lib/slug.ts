@@ -6,7 +6,8 @@ const MAP: Record<string, string> = {
 }
 const START: Record<string, string> = { є: 'ye', ї: 'yi', й: 'y', ю: 'yu', я: 'ya' }
 
-export function slugify(input: string): string {
+// Full transliterated slug, before length limit.
+export function slugBase(input: string): string {
   return input
     .toLowerCase()
     .split(/(\s+)/)
@@ -17,5 +18,15 @@ export function slugify(input: string): string {
     .normalize('NFKD')
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
-    .slice(0, 90)
+}
+
+export const slugify = (input: string): string => cutAtWord(slugBase(input), SLUG_MAX)
+
+export const SLUG_MAX = 90
+
+// Long slugs are cut at the last whole word, not in the middle of one.
+function cutAtWord(s: string, max: number): string {
+  if (s.length <= max) return s
+  const dash = s.lastIndexOf('-', max)
+  return (dash > max / 2 ? s.slice(0, dash) : s.slice(0, max)).replace(/-+$/, '')
 }
