@@ -1,7 +1,7 @@
 # DESIGN.md — «Мідгард»
 
 Archaeology news media. Feel: a serious newspaper with a sense of deep time — dense, calm, trustworthy, not a museum brochure.
-Direction comes from the two approved style references (`midgard_homepage_corrected.png`, `midgard_article_corrected.png`): navy masthead, white page, blue section bars, bold serif headlines, dense news lists. Composition and block counts come from ТЗ 1.1, not from the references.
+Direction comes from the two approved style references (`midgard_homepage_corrected.png`, `midgard_article_corrected.png`): navy masthead, white page, blue section bars, bold headlines, dense news lists. Since 25 Nov 2026 all text is set in one family (Inter); the serif survives only in the logo. Composition and block counts come from ТЗ 1.1, not from the references.
 
 ## Color
 
@@ -21,7 +21,7 @@ All text pairs pass WCAG AA (ratio on white unless noted).
 | `--surface` | `#FFFFFF` | Page background |
 | `--surface-2` | `#F3F6FA` | Sidebars on article page, search field, footer top |
 | `--bronze-700` | `#8A5A12` | Single accent: «Текст дня» kicker, epoch labels. Text-safe 5.9:1 |
-| `--bronze-400` | `#C08A2E` | Decorative only (thin rules, logo emblem). Never for text |
+| `--bronze-400` | `#C08A2E` | Decorative only (thin rules, gold half of the emblem, gold ruins column). Never for text |
 | `--ad-fg` / `--ad-bg` | `#9A3412` / `#FFF1E6` | «Реклама» label. 6.6:1 |
 | `--success` `--warning` `--error` | `#1E7B4A` `#9A6700` `#B42318` | Forms and CMS states only |
 
@@ -31,16 +31,16 @@ No dark mode in v1. No gradients except the photo overlay on the masthead.
 
 Fonts must support Ukrainian Cyrillic (і, ї, є, ґ, ’). Free, self-hosted, `font-display: swap`. Fonts by Russian foundries (ParaType, Golos) are deliberately not used.
 
-- **Source Serif 4** — headlines, wordmark, section titles. Weights 600, 700.
+- **Source Serif 4** — logo only: wordmark «МІДГАРД» (header and footer) and the tagline. Weights 600, 700, Cyrillic + Latin subsets. Token `--logo-font`.
 - **Inter** — body, UI, meta. Weights 400, 500, 600.
 
 | Token | Size / line | Font, weight | Use |
 | --- | --- | --- | --- |
-| `--t-display` | 40 / 46 (mobile 30 / 36) | Serif 700 | Article H1 |
-| `--t-h1` | 30 / 36 (mobile 24 / 30) | Serif 700 | «Текст дня» headline, rubric page title |
-| `--t-h2` | 24 / 30 | Serif 700, blue-600 | H2 inside article |
-| `--t-h3` | 19 / 25 | Serif 700 | H3 in article, card headline large |
-| `--t-card` | 16 / 21 | Serif 600 | List and card headlines |
+| `--t-display` | 38 / 44, −0.015em (mobile 30 / 36) | Inter 700 | Article H1, rubric page title |
+| `--t-h1` | 30 / 36, −0.015em | Inter 700 | «Текст дня» headline |
+| `--t-h2` | 24 / 30, −0.01em | Inter 700, blue-600 | H2 inside article |
+| `--t-h3` | 19 / 25 | Inter 700 | H3 in article, card headline large |
+| `--t-card` | 16 / 21 | Inter 600 | List and card headlines |
 | `--t-body` | 18 / 30 | Inter 400 | Article text, max 68ch |
 | `--t-ui` | 15 / 22 | Inter 400/500 | Lead, nav, sidebar items |
 | `--t-meta` | 13 / 18 | Inter 500 | Time, date, author, captions, chips |
@@ -61,8 +61,8 @@ Fonts must support Ukrainian Cyrillic (і, ї, є, ґ, ’). Free, self-hosted, 
 
 ## Components
 
-- **Masthead**: navy-900 band with a dim photo of ruins/bust at 20% under a navy overlay; service links left, socials right; emblem + wordmark «МІДГАРД» (Serif 700, tracking +0.04em) | divider | tagline «ЗАГУБЛЕНИЙ СВІТ ЛЮДЕЙ» (Serif 600 caps, blue-200).
-- **Main nav**: white bar, items Serif 600 17px, ink-900; active/hover underline 3px blue-600. Search icon at the right.
+- **Masthead**: navy-900 band; ghosted ruins at the right (opacity .18) with two opaque accent columns, gold then pale; service links left, socials right; lockup from 768 px aligned to the left edge of the container (centred on mobile): emblem (hand axe, 44 px) + wordmark «МІДГАРД» (Serif 700, tracking +0.04em) | divider | tagline «ЗАГУБЛЕНИЙ СВІТ ЛЮДЕЙ» (Serif 600 caps, blue-200).
+- **Main nav**: white bar, five items, Inter 600 16px, ink-900; active/hover underline 3px blue-600. Search icon at the right.
 - **Rubric rows**: two rows on `--blue-100`; navy-900 label chip on the left («Регіони світу», «Епохи»); items Inter 500 14px separated by «·»; epochs row scrolls horizontally on overflow, never wraps to 3 lines.
 - **Section header**: navy-900 label tab (Inter 600 caps, white) with a 12px angled right edge, followed by a full-width 4px blue-100 bar; optional «Усі … →» link on the right in blue-600.
 - **News list item**: time (meta, ink-500, tabular numbers) + headline (`--t-card`). Divider below.
@@ -72,6 +72,9 @@ Fonts must support Ukrainian Cyrillic (і, ї, є, ґ, ’). Free, self-hosted, 
 - **Buttons**: primary blue-600 fill / white text; secondary blue-600 1px outline; quiet text link. Hover darkens 8%, focus 2px blue-600 ring with 2px offset, disabled 40% opacity.
 - **Chips (tags)**: blue-100 fill, blue-600 text, radius 4.
 - **Source box**: blue-100 fill, info icon, «Джерело:» + links.
+- **Quote (`blockquote`)**: Inter 600 20/30, navy-800, 3px bronze-400 rule on the left; in interviews answers are quotes.
+- **Facebook button** (article meta bar): one 40×40 outline button, opens the project's Facebook in a new tab; no share buttons.
+- **Edit button** (logged-in editors only): fixed 48×48 blue-600 square with a pencil, bottom-left, opens the article in the admin.
 - **Breadcrumbs**: meta size, ink-500, «›» separators, links blue-600.
 - **Footer**: navy-900, three columns of links, RSS, social, © line.
 
@@ -79,7 +82,7 @@ Fonts must support Ukrainian Cyrillic (і, ї, є, ґ, ’). Free, self-hosted, 
 
 - Real archaeological photography only, with credit. Thumbnails 3:2, lead 16:10, OG 1200×630.
 - Icons: Lucide (outline, 1.75px stroke), 20px in UI, 16px in meta.
-- Logo emblem: a simple compass-rose/world-tree mark in bronze-400 on navy; no clip-art busts in the logo itself.
+- Logo emblem: a two-tone knapped-stone hand axe (gold left half bronze-400, pale right half blue-100), `src/components/Emblem.tsx`; favicons use it on a navy tile. Brand asset: do not redraw or recolour.
 
 ## Avoid
 
