@@ -50,7 +50,7 @@ Fonts must support Ukrainian Cyrillic (і, ї, є, ґ, ’). Free, self-hosted, 
 
 - 4-based scale: 4, 8, 12, 16, 24, 32, 48, 64.
 - Container 1200px, gutters 24px. Desktop grid 12 columns.
-- Homepage tier 1: 3 + 6 + 3 columns. Tier 2: 6 + 6 (Публікації, Спецпроєкти). Article: 8 (text column max 68ch) + 4 sidebar.
+- Homepage tier 1: 3 + 6 + 3 columns. Tier 2: up to three equal columns — Публікації, Інтерв’ю, Спецпроєкти; empty sections are hidden and the rest share the row. Article: 8 (text column max 68ch) + 4 sidebar.
 - Breakpoints: mobile < 768, tablet 768–1279 (2 columns), desktop ≥ 1280.
 - Between homepage tiers: 48px. Between list items: 12px with a 1px `--line` divider.
 

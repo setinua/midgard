@@ -947,6 +947,10 @@ export interface Homepage {
   /**
    * До 5. Якщо порожньо — показуються останні матеріали цього типу.
    */
+  pinnedInterviews?: (number | Article)[] | null;
+  /**
+   * До 5. Якщо порожньо — показуються останні матеріали цього типу.
+   */
   pinnedSpecials?: (number | Article)[] | null;
   /**
    * Поки немає даних аналітики, «Популярні» добираються вручну. Порожньо — блок не показується.
@@ -984,6 +988,7 @@ export interface HomepageSelect<T extends boolean = true> {
   mainToday?: T;
   newsCount?: T;
   pinnedPublications?: T;
+  pinnedInterviews?: T;
   pinnedSpecials?: T;
   popular?: T;
   updatedAt?: T;

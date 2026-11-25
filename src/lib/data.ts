@@ -98,12 +98,13 @@ export const getHomepage = cache(cached('homepage', async () => {
     const more = await findArticles({ where: [{ type: { equals: type } }], limit: 5 - picked.length, exclude: [...used, ...picked.map((x) => x.id)] })
     return [...picked, ...more.docs]
   }
-  const [publications, specials, partners] = await Promise.all([
+  const [publications, interviews, specials, partners] = await Promise.all([
     fill(home.pinnedPublications, 'publication'),
+    fill(home.pinnedInterviews, 'interview'),
     fill(home.pinnedSpecials, 'special'),
     findArticles({ where: [{ type: { equals: 'partner' } }], limit: 6 }).then((r) => r.docs),
   ])
-  return { textOfDay, news: news.docs, main, publications, specials, partners, popular }
+  return { textOfDay, news: news.docs, main, publications, interviews, specials, partners, popular }
 }))
 
 export async function getArticle(typeValue: string, slug: string) {

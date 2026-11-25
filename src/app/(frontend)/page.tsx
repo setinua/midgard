@@ -1,3 +1,4 @@
+import type React from 'react'
 import Link from 'next/link'
 import { AdLabel, Empty, NewsList, SectionHead, ThumbList, metaLine } from '../../components/Blocks'
 import { Img } from '../../components/Img'
@@ -44,21 +45,26 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="t2" aria-label="Публікації, спецпроєкти">
-        {(
+      {(() => {
+        // Second tier: up to three sections; empty ones are hidden and the rest share the row.
+        const blocks = (
           [
             ['Публікації', '/publikatsii', h.publications],
+            ['Інтерв’ю', '/interviu', h.interviews],
             ['Спецпроєкти', '/spetsproiekty', h.specials],
           ] as const
-        )
-          .filter(([, , items]) => items.length)
-          .map(([title, url, items]) => (
-            <div key={url}>
-              <SectionHead title={title} more={{ href: url, label: 'Усі →' }} />
-              <ThumbList items={items} size={96} small={false} />
-            </div>
-          ))}
-      </section>
+        ).filter(([, , items]) => items.length)
+        return blocks.length ? (
+          <section className="t2" aria-label="Публікації, інтерв’ю, спецпроєкти" style={{ '--n': blocks.length } as React.CSSProperties}>
+            {blocks.map(([title, url, items]) => (
+              <div key={url}>
+                <SectionHead title={title} more={{ href: url, label: 'Усі →' }} />
+                <ThumbList items={items} size={96} small={false} />
+              </div>
+            ))}
+          </section>
+        ) : null
+      })()}
 
       {h.partners.length > 0 && (
         <section>
