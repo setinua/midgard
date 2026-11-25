@@ -54,7 +54,7 @@ export const findArticles = cached('findArticles', async (opts: {
   const res = await p.find({
     collection: 'articles',
     where: { and },
-    sort: '-publishedAt',
+    sort: ['-publishedAt', '-id'],
     limit: opts.limit ?? PAGE_SIZE,
     page: opts.page ?? 1,
     depth: 1,
@@ -125,19 +125,30 @@ async function queryArticle(typeValue: string, slug: string, draft: boolean) {
 }
 const cachedArticle = cached('article', queryArticle)
 
-export async function getRelated(a: Article): Promise<Card[]> {
-  const manual = livePicks(a.related).slice(0, 4)
-  if (manual.length >= 4) return manual
-  const ids = (v: unknown[] | null | undefined) => (v || []).map((x) => (typeof x === 'object' ? (x as { id: number }).id : x)) as number[]
-  const tagIds = ids(a.tags)
-  const or: Where[] = [{ primaryRegion: { equals: rel<Region>(a.primaryRegion)?.id } }, { primaryEpoch: { equals: rel<Epoch>(a.primaryEpoch)?.id } }]
-  if (tagIds.length) or.unshift({ tags: { in: tagIds } })
-  const auto = await findArticles({
-    where: [{ or }, { type: { not_equals: 'partner' } }],
-    limit: 4 - manual.length,
-    exclude: [a.id, ...manual.map((m) => m.id)],
-  })
-  return [...manual, ...auto.docs]
+const idsOf = (v: unknown[] | null | undefined) =>
+  (v || []).map((x) => (x && typeof x === 'object' ? (x as { id: number }).id : x)).filter((x): x is number => typeof x === 'number')
+
+// «Читайте також», 4 cards: manual picks first (editor's choice), then articles sharing an epoch,
+// then sharing a region, then the newest. Never the article itself, no duplicates, no partner materials.
+export async function getRelated(a: Article, find: typeof findArticles = findArticles): Promise<Card[]> {
+  const N = 4
+  const picked: Card[] = livePicks(a.related).filter((x) => x.id !== a.id).slice(0, N)
+  const epochIds = [...new Set([rel<Epoch>(a.primaryEpoch)?.id, ...idsOf(a.epochs)].filter((x): x is number => typeof x === 'number'))]
+  const regionIds = [...new Set([rel<Region>(a.primaryRegion)?.id, ...idsOf(a.regions)].filter((x): x is number => typeof x === 'number'))]
+  const shares = (one: string, many: string, list: number[]): Where[] =>
+    list.length ? [{ or: [{ [one]: { in: list } }, { [many]: { in: list } }] }] : []
+  const steps: Where[][] = [shares('primaryEpoch', 'epochs', epochIds), shares('primaryRegion', 'regions', regionIds), []]
+  for (const [i, where] of steps.entries()) {
+    if (picked.length >= N) break
+    if (i < 2 && !where.length) continue
+    const res = await find({
+      where: [...where, { type: { not_equals: 'partner' } }],
+      limit: N - picked.length,
+      exclude: [a.id, ...picked.map((m) => m.id)],
+    })
+    picked.push(...res.docs)
+  }
+  return picked.slice(0, N)
 }
 
 export async function getSidebar(excludeId?: number) {
