@@ -5,7 +5,7 @@ export function Footer({ description, copyright }: { description?: string | null
     <footer className="foot">
       <div className="wrap foot-cols">
         <div style={{ flex: '1 1 240px' }}>
-          <div style={{ font: '700 24px var(--serif)', color: '#fff', letterSpacing: '.04em' }}>МІДГАРД</div>
+          <div style={{ font: '700 24px var(--logo-font)', color: '#fff', letterSpacing: '.04em' }}>МІДГАРД</div>
           <p style={{ margin: '8px 0 0', lineHeight: '22px' }}>{description}</p>
         </div>
         <nav aria-label="Розділи">

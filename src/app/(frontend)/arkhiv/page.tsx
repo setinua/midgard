@@ -26,7 +26,7 @@ export default async function Archive() {
       {years.length === 0 && <p className="empty">Матеріалів поки немає.</p>}
       {years.map((y) => (
         <section key={y} style={{ marginBottom: 24 }}>
-          <h2 style={{ font: '700 24px var(--serif)', margin: '16px 0 8px' }}>{y}</h2>
+          <h2 style={{ font: '700 24px var(--sans)', margin: '16px 0 8px' }}>{y}</h2>
           <div className="chips">
             {rows.filter((r) => r.y === y).map((r) => (
               <Link key={r.m} className="chip" href={`/arkhiv/${y}/${String(r.m).padStart(2, '0')}`}>{MONTHS[r.m - 1]} · {r.n}</Link>
