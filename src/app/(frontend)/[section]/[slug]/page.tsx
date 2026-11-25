@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { AdLabel, NewsList, SectionHead, ThumbList } from '../../../../components/Blocks'
+import { EditButton } from '../../../../components/EditButton'
 import { Icon } from '../../../../components/Icons'
 import { Img } from '../../../../components/Img'
 import { Prose } from '../../../../components/Prose'
@@ -160,6 +161,7 @@ export default async function ArticlePage({ params }: Props) {
           </div>
         </section>
       )}
+      <EditButton id={a.id} />
     </article>
   )
 
