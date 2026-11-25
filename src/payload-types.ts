@@ -183,7 +183,7 @@ export interface Article {
   epochs?: (number | Epoch)[] | null;
   tags?: (number | Tag)[] | null;
   /**
-   * Якщо порожньо — підбираються автоматично за тегами й рубриками.
+   * Ручний вибір показується першим. Решту місць (до 4) сайт добирає сам: спершу та сама епоха, потім той самий регіон, потім найновіші.
    */
   related?: (number | Article)[] | null;
   interviewee?: {
@@ -196,7 +196,7 @@ export interface Article {
    * Латиницею. Заповнюється із заголовка, можна змінити.
    */
   slug: string;
-  type: 'news' | 'publication' | 'column' | 'interview' | 'special' | 'partner';
+  type: 'news' | 'publication' | 'interview' | 'special' | 'partner';
   publishedAt: string;
   contentUpdatedAt?: string | null;
   authors?: (number | Author)[] | null;
@@ -947,10 +947,6 @@ export interface Homepage {
   /**
    * До 5. Якщо порожньо — показуються останні матеріали цього типу.
    */
-  pinnedColumns?: (number | Article)[] | null;
-  /**
-   * До 5. Якщо порожньо — показуються останні матеріали цього типу.
-   */
   pinnedSpecials?: (number | Article)[] | null;
   /**
    * Поки немає даних аналітики, «Популярні» добираються вручну. Порожньо — блок не показується.
@@ -988,7 +984,6 @@ export interface HomepageSelect<T extends boolean = true> {
   mainToday?: T;
   newsCount?: T;
   pinnedPublications?: T;
-  pinnedColumns?: T;
   pinnedSpecials?: T;
   popular?: T;
   updatedAt?: T;
