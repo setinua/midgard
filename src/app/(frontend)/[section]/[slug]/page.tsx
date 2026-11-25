@@ -102,10 +102,8 @@ export default async function ArticlePage({ params }: Props) {
             </span>
           </span>
         </div>
-        <div className="share" aria-label="Поширити">
-          <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`} target="_blank" rel="noopener" aria-label="Поширити у Facebook"><Icon.facebook /></a>
-          <a href={`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(a.title)}`} target="_blank" rel="noopener" aria-label="Поширити в Telegram"><Icon.telegram /></a>
-          <a href={`https://x.com/intent/post?url=${encodeURIComponent(url)}&text=${encodeURIComponent(a.title)}`} target="_blank" rel="noopener" aria-label="Поширити в X"><Icon.x /></a>
+        <div className="share">
+          <a href="https://www.facebook.com/mchaikovskiy" target="_blank" rel="noopener" aria-label="Мідгард у Facebook"><Icon.facebook /></a>
         </div>
       </div>
       {a.type === 'interview' && a.interviewee?.name && (
