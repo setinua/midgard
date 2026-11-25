@@ -32,7 +32,7 @@ No dark mode in v1. No gradients except the photo overlay on the masthead.
 Fonts must support Ukrainian Cyrillic (і, ї, є, ґ, ’). Free, self-hosted, `font-display: swap`. Fonts by Russian foundries (ParaType, Golos) are deliberately not used.
 
 - **Source Serif 4** — logo only: wordmark «МІДГАРД» (header and footer) and the tagline. Weights 600, 700, Cyrillic + Latin subsets. Token `--logo-font`.
-- **Inter** — body, UI, meta. Weights 400, 500, 600.
+- **Inter** — everything else: headlines, body, UI, meta. Weights 400, 500, 600, 700.
 
 | Token | Size / line | Font, weight | Use |
 | --- | --- | --- | --- |
@@ -50,7 +50,7 @@ Fonts must support Ukrainian Cyrillic (і, ї, є, ґ, ’). Free, self-hosted, 
 
 - 4-based scale: 4, 8, 12, 16, 24, 32, 48, 64.
 - Container 1200px, gutters 24px. Desktop grid 12 columns.
-- Homepage tier 1: 3 + 6 + 3 columns. Tier 2: 4 + 4 + 4. Article: 8 (text column max 68ch) + 4 sidebar.
+- Homepage tier 1: 3 + 6 + 3 columns. Tier 2: 6 + 6 (Публікації, Спецпроєкти). Article: 8 (text column max 68ch) + 4 sidebar.
 - Breakpoints: mobile < 768, tablet 768–1279 (2 columns), desktop ≥ 1280.
 - Between homepage tiers: 48px. Between list items: 12px with a 1px `--line` divider.
 
@@ -66,7 +66,7 @@ Fonts must support Ukrainian Cyrillic (і, ї, є, ґ, ’). Free, self-hosted, 
 - **Rubric rows**: two rows on `--blue-100`; navy-900 label chip on the left («Регіони світу», «Епохи»); items Inter 500 14px separated by «·»; epochs row scrolls horizontally on overflow, never wraps to 3 lines.
 - **Section header**: navy-900 label tab (Inter 600 caps, white) with a 12px angled right edge, followed by a full-width 4px blue-100 bar; optional «Усі … →» link on the right in blue-600.
 - **News list item**: time (meta, ink-500, tabular numbers) + headline (`--t-card`). Divider below.
-- **Card with thumb**: 96×64 thumb (3:2) + headline; columns variant adds author with 24px avatar.
+- **Card with thumb**: 96×64 thumb (3:2) + headline.
 - **Lead card («Текст дня»)**: kicker in bronze-700, 16:10 photo, H1, lead, meta «Автор · дата».
 - **Partner card**: like card with thumb + date + «Реклама» chip (ad colors).
 - **Buttons**: primary blue-600 fill / white text; secondary blue-600 1px outline; quiet text link. Hover darkens 8%, focus 2px blue-600 ring with 2px offset, disabled 40% opacity.
