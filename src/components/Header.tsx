@@ -2,6 +2,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
+import { Emblem } from './Emblem'
 import { Icon } from './Icons'
 
 type Item = { name: string; slug: string }
@@ -48,7 +49,7 @@ export function Header({ regions, epochs, social }: { regions: Item[]; epochs: I
           <div className="brand-row">
             <button className="icon-btn burger" aria-label="Меню" aria-expanded={open} aria-controls="mmenu" onClick={() => setOpen(!open)}><Icon.menu /></button>
             <Link href="/" className="brand" aria-label="Мідгард — на головну">
-              <Icon.emblem />
+              <Emblem className="brand-mark" />
               <span className="wordmark">МІДГАРД</span>
             </Link>
             <span className="tagline">Загублений<br />світ людей</span>

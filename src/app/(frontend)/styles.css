@@ -35,7 +35,7 @@ a:hover { color: var(--blue-600); }
 
 /* Masthead */
 .mast { background: var(--navy-900); color: #fff; position: relative; overflow: hidden; }
-.mast .ruins { position: absolute; right: 0; bottom: 0; opacity: 0.18; pointer-events: none; }
+.mast .ruins { position: absolute; right: 0; bottom: 0; pointer-events: none; } /* opacity lives inside the SVG */
 .mast-top { display: flex; justify-content: space-between; align-items: center; padding-top: 10px; font-size: 13px; position: relative; }
 .mast-top a { color: var(--blue-200); }
 .mast-top a:hover { color: #fff; }
@@ -44,6 +44,8 @@ a:hover { color: var(--blue-600); }
 .brand-row { display: flex; align-items: center; justify-content: center; gap: 20px; padding: 14px 0 18px; position: relative; }
 .brand { display: flex; align-items: center; gap: 12px; color: #fff; }
 .brand:hover { color: #fff; }
+.brand-mark { margin-block: -2px; flex: none; }
+@media (min-width: 768px) { .brand-row { justify-content: flex-start; } }
 .wordmark { font: 700 40px/1 var(--serif); letter-spacing: 0.04em; }
 .tagline { border-left: 1px solid var(--blue-200); padding-left: 20px; font: 600 15px/18px var(--serif); letter-spacing: 0.08em; color: var(--blue-200); text-transform: uppercase; }
 .icon-btn { background: none; border: 0; color: inherit; padding: 10px; cursor: pointer; display: inline-flex; min-width: 44px; min-height: 44px; align-items: center; justify-content: center; }

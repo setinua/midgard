@@ -23,7 +23,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: s.description || undefined,
     alternates: { types: { 'application/rss+xml': `${SITE_URL}/rss.xml` } },
     openGraph: { siteName: SITE_NAME, locale: 'uk_UA', type: 'website' },
-    icons: { icon: '/favicon.svg', apple: '/apple-touch-icon.png' },
+    icons: { icon: [{ url: '/favicon.svg?v=2', type: 'image/svg+xml' }, { url: '/favicon.ico?v=2', sizes: '48x48' }], apple: '/apple-touch-icon.png?v=2' },
     robots: closed ? { index: false, follow: false } : { index: true, follow: true, 'max-image-preview': 'large' },
   }
 }
