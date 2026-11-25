@@ -1,7 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import { APIError } from 'payload'
 import { ownOrEditor, publishedOrStaff, isLoggedIn, isEditorOrAdmin } from '../access'
-import { ARTICLE_TYPES } from '../lib/constants'
+import { ARTICLE_TYPES, typeByValue } from '../lib/constants'
 import { lexicalToText } from '../lib/lexical'
 import { seoFields, slugField } from './fields'
 
@@ -15,6 +15,13 @@ export const Articles: CollectionConfig = {
     group: 'Контент',
     defaultColumns: ['title', 'type', 'primaryRegion', 'publishedAt', '_status'],
     listSearchableFields: ['title', 'lead'],
+    // «Переглянути»: opens the article on the site (latest saved version, drafts included, for logged-in users).
+    preview: (doc) => {
+      const t = typeByValue(String(doc?.type || ''))
+      if (!t || !doc?.slug) return null
+      const site = (process.env.SERVER_URL || '').replace(/\/$/, '')
+      return `${site}/pereglyad?path=${encodeURIComponent(`/${t.path}/${doc.slug}`)}`
+    },
   },
   defaultSort: '-publishedAt',
   access: { read: publishedOrStaff, create: isLoggedIn, update: ownOrEditor, delete: isEditorOrAdmin },

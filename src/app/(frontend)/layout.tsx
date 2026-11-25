@@ -5,6 +5,7 @@ import '@fontsource/source-serif-4/600.css'
 import '@fontsource/source-serif-4/700.css'
 import './styles.css'
 import type { Metadata } from 'next'
+import { draftMode } from 'next/headers'
 import Script from 'next/script'
 import React from 'react'
 import { Footer } from '../../components/Footer'
@@ -29,7 +30,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const [{ regions, epochs }, s] = await Promise.all([getTaxonomy(), getSettings()])
+  const [{ regions, epochs }, s, dm] = await Promise.all([getTaxonomy(), getSettings(), draftMode()])
   const org = {
     '@context': 'https://schema.org',
     '@type': 'NewsMediaOrganization',
@@ -41,6 +42,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="uk">
       <body>
+        {dm.isEnabled && (
+          <div className="draft-bar" role="status">Режим перегляду: видно чернетки й незбережені для читачів зміни · <a href="/pereglyad?exit=1">Вийти</a></div>
+        )}
         <Header regions={regions} epochs={epochs} social={(s.social || []) as { network: string; url: string }[]} />
         <main id="main">{children}</main>
         <Footer description={s.description} copyright={s.copyright} />
