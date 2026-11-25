@@ -107,9 +107,6 @@ export default async function ArticlePage({ params }: Props) {
           <a href={`https://x.com/intent/post?url=${encodeURIComponent(url)}&text=${encodeURIComponent(a.title)}`} target="_blank" rel="noopener" aria-label="Поширити в X"><Icon.x /></a>
         </div>
       </div>
-      {a.type === 'column' && authors[0]?.bio && (
-        <div className="person"><span className="meta" style={{ color: 'var(--ink-600)' }}>{authors[0].bio} Думка автора може не збігатися з позицією редакції.</span></div>
-      )}
       {a.type === 'interview' && a.interviewee?.name && (
         <div className="person">
           <Img media={img(a.interviewee.photo)} size="thumb" className="av-48" sizes="48px" />

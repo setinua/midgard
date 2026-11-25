@@ -2,7 +2,6 @@
 export const ARTICLE_TYPES = [
   { value: 'news', path: 'novyny', label: 'Новини', single: 'Новина' },
   { value: 'publication', path: 'publikatsii', label: 'Публікації', single: 'Публікація' },
-  { value: 'column', path: 'kolonky', label: 'Колонки', single: 'Колонка' },
   { value: 'interview', path: 'interviu', label: 'Інтерв’ю', single: 'Інтерв’ю' },
   { value: 'special', path: 'spetsproiekty', label: 'Спецпроєкти', single: 'Спецпроєкт' },
   { value: 'partner', path: 'partnerski', label: 'Партнерські матеріали', single: 'Партнерський матеріал' },

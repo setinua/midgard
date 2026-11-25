@@ -29,7 +29,6 @@ export const Homepage: GlobalConfig = {
     },
     { name: 'newsCount', type: 'number', min: 10, max: 15, defaultValue: 12, label: 'Скільки позицій в «Останніх новинах»' },
     pick('pinnedPublications', 'Закріплені публікації', 5, 'publication'),
-    pick('pinnedColumns', 'Закріплені колонки', 5, 'column'),
     pick('pinnedSpecials', 'Закріплені спецпроєкти', 5, 'special'),
     {
       name: 'popular',

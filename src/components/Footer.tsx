@@ -9,7 +9,7 @@ export function Footer({ description, copyright }: { description?: string | null
           <p style={{ margin: '8px 0 0', lineHeight: '22px' }}>{description}</p>
         </div>
         <nav aria-label="Розділи">
-          <Link href="/novyny">Новини</Link><Link href="/publikatsii">Публікації</Link><Link href="/kolonky">Колонки</Link><Link href="/interviu">Інтерв’ю</Link><Link href="/spetsproiekty">Спецпроєкти</Link>
+          <Link href="/novyny">Новини</Link><Link href="/publikatsii">Публікації</Link><Link href="/interviu">Інтерв’ю</Link><Link href="/spetsproiekty">Спецпроєкти</Link>
         </nav>
         <nav aria-label="Про медіа">
           <Link href="/pro-proiekt">Про проєкт</Link><Link href="/komanda">Команда</Link><Link href="/kontakty">Контакти</Link><Link href="/redaktsiina-polityka">Редакційна політика</Link><Link href="/pidtrymaty">Підтримати</Link>

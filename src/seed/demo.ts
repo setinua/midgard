@@ -68,7 +68,7 @@ const content = {
   },
 }
 
-const plan: [string, number][] = [['news', 14], ['publication', 6], ['column', 6], ['interview', 2], ['special', 6], ['partner', 6]]
+const plan: [string, number][] = [['news', 14], ['publication', 6], ['interview', 2], ['special', 6], ['partner', 6]]
 let n = 0
 const ids: Record<string, number[]> = {}
 for (const [type, count] of plan) {

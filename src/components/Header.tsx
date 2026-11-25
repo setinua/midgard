@@ -11,7 +11,6 @@ type Social = { network: string; url: string }
 const MAIN = [
   ['Новини', '/novyny'],
   ['Публікації', '/publikatsii'],
-  ['Колонки', '/kolonky'],
   ['Інтерв’ю', '/interviu'],
   ['Спецпроєкти', '/spetsproiekty'],
   ['Архів', '/arkhiv'],

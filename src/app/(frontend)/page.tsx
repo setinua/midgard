@@ -44,19 +44,18 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="t2" aria-label="Публікації, колонки, спецпроєкти">
+      <section className="t2" aria-label="Публікації, спецпроєкти">
         {(
           [
-            ['Публікації', '/publikatsii', h.publications, false],
-            ['Колонки', '/kolonky', h.columns, true],
-            ['Спецпроєкти', '/spetsproiekty', h.specials, false],
+            ['Публікації', '/publikatsii', h.publications],
+            ['Спецпроєкти', '/spetsproiekty', h.specials],
           ] as const
         )
           .filter(([, , items]) => items.length)
-          .map(([title, url, items, isCol]) => (
+          .map(([title, url, items]) => (
             <div key={url}>
               <SectionHead title={title} more={{ href: url, label: 'Усі →' }} />
-              <ThumbList items={items} size={96} small={false} withAuthor={isCol} avatar={isCol} />
+              <ThumbList items={items} size={96} small={false} />
             </div>
           ))}
       </section>
