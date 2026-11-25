@@ -203,5 +203,5 @@ figcaption { font: 400 13px/18px var(--sans); color: var(--ink-600); margin-top:
 .prose .embed th, .prose .embed td { border: 1px solid #d6dde8; padding: 8px 10px; text-align: left; vertical-align: top; }
 
 /* Draft preview bar (only with draft mode on) */
-.draft-bar { position: sticky; top: 0; z-index: 60; background: var(--warning); color: #fff; font: 500 13px/18px var(--sans); text-align: center; padding: 6px 12px; }
+.draft-bar { position: sticky; top: 0; z-index: 60; background: #9a6700; color: #fff; font: 500 13px/18px var(--sans); text-align: center; padding: 6px 12px; }
 .draft-bar a { color: #fff; text-decoration: underline; }
