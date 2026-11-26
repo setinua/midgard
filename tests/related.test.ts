@@ -54,5 +54,11 @@ const m = { ...docs[18], related: [docs[18], docs[9]] }
 const gotM = (await getRelated(m as any, find)).map((x: any) => x.n)
 console.log(`${gotM[0] === 9 && !gotM.includes(18) ? 'OK ' : 'BAD'} ручний вибір першим: ${gotM.join(', ')}`)
 if (gotM[0] !== 9 || gotM.includes(18)) bad++
+// Partner (ad) material: no matching by epoch/region — simply the 4 newest (#18 shares epoch with #0, #2, #3).
+const ad = { ...docs[18], id: 1, n: -1, type: 'partner' }
+const gotAd = (await getRelated(ad as any, find)).map((x: any) => x.n)
+const okAd = JSON.stringify(gotAd) === JSON.stringify([0, 1, 2, 3])
+console.log(`${okAd ? 'OK ' : 'BAD'} реклама — найновіші: ${gotAd.join(', ')}`)
+if (!okAd) bad++
 console.log(bad ? `\nПОМИЛОК: ${bad}` : '\nУсі рядки збігаються')
 process.exit(bad ? 1 : 0)

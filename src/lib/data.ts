@@ -77,15 +77,18 @@ export const getHomepage = cache(cached('homepage', async () => {
   const textOfDay = livePicks([home.textOfDay])[0] || null
   const used = textOfDay ? [textOfDay.id] : []
 
-  const news = await findArticles({ where: [{ type: { equals: 'news' } }], limit: home.newsCount || 12 })
+  // On wide screens the side columns of the top row are cut to the height of the centre column (lead + «Популярні»),
+  // so they get EXTRA spare items to fill it; on narrow screens the spare items are hidden (class x-extra).
+  const EXTRA = 10
+  const news = await findArticles({ where: [{ type: { equals: 'news' } }], limit: (home.newsCount || 12) + EXTRA })
   // «Головне сьогодні»: editor's picks in their order, topped up with the newest materials to the same count as the
   // news column (10–15), so a single pick no longer leaves the column almost empty. «Популярні» are not repeated here.
   const popular = livePicks(home.popular).slice(0, 5)
   const target = home.newsCount || 12
-  let main = livePicks(home.mainToday).filter((a) => !used.includes(a.id)).slice(0, target)
-  if (main.length < target) {
+  let main = livePicks(home.mainToday).filter((a) => !used.includes(a.id)).slice(0, target + EXTRA)
+  if (main.length < target + EXTRA) {
     const more = await findArticles({
-      limit: target - main.length,
+      limit: target + EXTRA - main.length,
       exclude: [...used, ...main.map((m) => m.id), ...news.docs.map((n) => n.id), ...popular.map((x) => x.id)],
       where: [{ type: { not_in: ['partner'] } }],
     })
@@ -104,7 +107,7 @@ export const getHomepage = cache(cached('homepage', async () => {
     fill(home.pinnedSpecials, 'special'),
     findArticles({ where: [{ type: { equals: 'partner' } }], limit: 6 }).then((r) => r.docs),
   ])
-  return { textOfDay, news: news.docs, main, publications, interviews, specials, partners, popular }
+  return { textOfDay, news: news.docs, main, publications, interviews, specials, partners, popular, count: target }
 }))
 
 export async function getArticle(typeValue: string, slug: string) {
@@ -131,6 +134,7 @@ const idsOf = (v: unknown[] | null | undefined) =>
 
 // «Читайте також», 4 cards: manual picks first (editor's choice), then articles sharing an epoch,
 // then sharing a region, then the newest. Never the article itself, no duplicates, no partner materials.
+// Under a partner (ad) material: manual picks, then simply the newest — no matching by epoch or region.
 export async function getRelated(a: Article, find: typeof findArticles = findArticles): Promise<Card[]> {
   const N = 4
   const picked: Card[] = livePicks(a.related).filter((x) => x.id !== a.id).slice(0, N)
@@ -138,7 +142,8 @@ export async function getRelated(a: Article, find: typeof findArticles = findArt
   const regionIds = [...new Set([rel<Region>(a.primaryRegion)?.id, ...idsOf(a.regions)].filter((x): x is number => typeof x === 'number'))]
   const shares = (one: string, many: string, list: number[]): Where[] =>
     list.length ? [{ or: [{ [one]: { in: list } }, { [many]: { in: list } }] }] : []
-  const steps: Where[][] = [shares('primaryEpoch', 'epochs', epochIds), shares('primaryRegion', 'regions', regionIds), []]
+  const ad = a.type === 'partner'
+  const steps: Where[][] = ad ? [[], [], []] : [shares('primaryEpoch', 'epochs', epochIds), shares('primaryRegion', 'regions', regionIds), []]
   for (const [i, where] of steps.entries()) {
     if (picked.length >= N) break
     if (i < 2 && !where.length) continue

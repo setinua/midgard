@@ -14,12 +14,12 @@ export function SectionHead({ title, more, level = 2 }: { title: string; more?: 
   )
 }
 
-export function NewsList({ items }: { items: Card[] }) {
+export function NewsList({ items, extraFrom }: { items: Card[]; extraFrom?: number }) {
   if (!items.length) return <p className="empty">Поки немає новин.</p>
   return (
     <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-      {items.map((n) => (
-        <li key={n.id}>
+      {items.map((n, i) => (
+        <li key={n.id} className={extraFrom !== undefined && i >= extraFrom ? 'x-extra' : undefined}>
           <Link href={href(n)} className="li">
             <time className="time" dateTime={n.publishedAt}>{time(n.publishedAt)}</time>
             <span className="h-card">{n.title}</span>
@@ -30,14 +30,14 @@ export function NewsList({ items }: { items: Card[] }) {
   )
 }
 
-export function ThumbList({ items, size = 72, small = true, withAuthor = false, avatar = false }: { items: Card[]; size?: 72 | 96 | 120; small?: boolean; withAuthor?: boolean; avatar?: boolean }) {
+export function ThumbList({ items, size = 72, small = true, withAuthor = false, avatar = false, extraFrom }: { items: Card[]; size?: 72 | 96 | 120; small?: boolean; withAuthor?: boolean; avatar?: boolean; extraFrom?: number }) {
   return (
     <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-      {items.map((a) => {
+      {items.map((a, i) => {
         const author = rel<Author>(a.authors?.[0])
         const pic = avatar ? img(author?.photo) || img(a.hero) : img(a.hero)
         return (
-          <li key={a.id}>
+          <li key={a.id} className={extraFrom !== undefined && i >= extraFrom ? 'x-extra' : undefined}>
             <Link href={href(a)} className="li li-thumb" style={{ alignItems: avatar ? 'center' : 'flex-start' }}>
               <Img media={pic} size="thumb" className={avatar ? 'av-48' : `th-${size}`} sizes={`${size}px`} />
               <span style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>

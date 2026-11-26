@@ -1,6 +1,7 @@
 import type React from 'react'
 import Link from 'next/link'
 import { AdLabel, Empty, NewsList, SectionHead, ThumbList, metaLine } from '../../components/Blocks'
+import { Balance } from '../../components/Balance'
 import { Img } from '../../components/Img'
 import { getHomepage, href, img, rel, type Epoch, type Region } from '../../lib/data'
 import { smart } from '../../lib/format'
@@ -13,10 +14,10 @@ export default async function Home() {
   return (
     <div className="wrap page stack-48">
       <h1 className="sr-only">Мідгард — археологічне медіа</h1>
-      <section className="t1">
-        <div>
+      <section className={`t1${lead ? ' balanced' : ''}`}>
+        <div className="t1-side">
           <SectionHead title="Останні новини" />
-          <NewsList items={h.news} />
+          <div className="fill"><NewsList items={h.news} extraFrom={h.count} /></div>
           <Link href="/novyny" className="more more-block">Усі новини →</Link>
         </div>
         <article className="c-lead lead-card">
@@ -32,17 +33,18 @@ export default async function Home() {
           ) : (
             <Empty>Редактор ще не обрав «Текст дня».</Empty>
           )}
-        </article>
-        <div>
-          <SectionHead title="Головне сьогодні" />
-          {h.main.length ? <ThumbList items={h.main} /> : <Empty>Поки немає матеріалів.</Empty>}
           {h.popular.length > 0 && (
             <div style={{ marginTop: 32 }}>
               <SectionHead title="Популярні" />
-              <ThumbList items={h.popular} />
+              <ThumbList items={h.popular} size={96} small={false} />
             </div>
           )}
+        </article>
+        <div className="t1-side">
+          <SectionHead title="Головне сьогодні" />
+          <div className="fill">{h.main.length ? <ThumbList items={h.main} extraFrom={h.count} /> : <Empty>Поки немає матеріалів.</Empty>}</div>
         </div>
+        <Balance />
       </section>
 
       {(() => {
