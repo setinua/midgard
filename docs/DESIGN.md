@@ -68,6 +68,7 @@ Fonts must support Ukrainian Cyrillic (і, ї, є, ґ, ’). Free, self-hosted, 
 - **News list item**: time (meta, ink-500, tabular numbers) + headline (`--t-card`). Divider below.
 - **Card with thumb**: 96×64 thumb (3:2) + headline.
 - **Lead card («Текст дня»)**: kicker in bronze-700, 16:10 photo, H1, lead, meta «Автор · дата».
+- **Homepage top row** (≥1280 px): «Останні новини» | «Текст дня» + «Популярні» (96 px thumbs) | «Головне сьогодні». The centre column sets the row height; side columns show only whole items that fit and spread the leftover space, so all three end on one line («Усі новини →» at the bottom of the left one). Below 1280 px — natural heights, item counts from the homepage settings.
 - **Partner card**: like card with thumb + date + «Реклама» chip (ad colors).
 - **Buttons**: primary blue-600 fill / white text; secondary blue-600 1px outline; quiet text link. Hover darkens 8%, focus 2px blue-600 ring with 2px offset, disabled 40% opacity.
 - **Chips (tags)**: blue-100 fill, blue-600 text, radius 4.
