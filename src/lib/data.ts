@@ -167,6 +167,8 @@ export const getTaxonomy = cache(cached('taxonomy', async () => {
   return { regions: regions.docs as Region[], epochs: epochs.docs as Epoch[] }
 }))
 
+export const getSections = cache(cached('sections', async () => (await payload()).findGlobal({ slug: 'sections', depth: 1 })))
+
 export const getSettings = cache(cached('settings', async () => (await payload()).findGlobal({ slug: 'settings', depth: 0 })))
 
 async function queryBySlug<T extends 'regions' | 'epochs' | 'tags' | 'authors' | 'pages'>(collection: T, slug: string) {

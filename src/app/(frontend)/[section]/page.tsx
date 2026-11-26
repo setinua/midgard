@@ -5,7 +5,13 @@ import { Img } from '../../../components/Img'
 import { Crumbs, ListPage, pageNoindex, type SP } from '../../../components/ListPage'
 import { Prose } from '../../../components/Prose'
 import { SITE_URL, typeByPath } from '../../../lib/constants'
-import { bySlug, cached, img, payload, type Author } from '../../../lib/data'
+import { bySlug, cached, getSections, img, payload, type Author } from '../../../lib/data'
+
+async function sectionInfo(t: { value: string; label: string }) {
+  const all = (await getSections()) as unknown as Record<string, { title?: string | null; text?: any; seoDescription?: string | null } | undefined>
+  const s = all?.[t.value]
+  return { title: s?.title?.trim() || t.label, text: s?.text, description: s?.seoDescription?.trim() || undefined }
+}
 
 const getTeam = cached('team', async () => {
   const p = await payload()
@@ -18,7 +24,10 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   const { section } = await params
   const sp = await searchParams
   const t = typeByPath(section)
-  if (t) return { title: t.label, alternates: { canonical: `${SITE_URL}/${t.path}` }, robots: pageNoindex(sp) ? { index: false, follow: true } : undefined }
+  if (t) {
+    const s = await sectionInfo(t)
+    return { title: s.title, description: s.description, alternates: { canonical: `${SITE_URL}/${t.path}` }, robots: pageNoindex(sp) ? { index: false, follow: true } : undefined }
+  }
   const p = await bySlug('pages', section)
   return p ? { title: p.seo?.title || p.title, description: p.seo?.description || p.intro || undefined } : {}
 }
@@ -28,14 +37,17 @@ export default async function Section({ params, searchParams }: Props) {
   const sp = await searchParams
   const t = typeByPath(section)
   if (t) {
+    const s = await sectionInfo(t)
+    const hasText = !!s.text?.root?.children?.some((c: any) => c.children?.length || c.type !== 'paragraph')
     return (
       <ListPage
-        title={t.label}
+        title={s.title}
+        intro={hasText ? <Prose data={s.text} /> : undefined}
         base={`/${t.path}`}
         sp={sp}
         where={[{ type: { equals: t.value } }]}
         filters={['region', 'epokha']}
-        crumbs={<Crumbs items={[['Головна', '/'], [t.label]]} />}
+        crumbs={<Crumbs items={[['Головна', '/'], [s.title]]} />}
       />
     )
   }

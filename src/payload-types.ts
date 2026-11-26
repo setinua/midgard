@@ -103,10 +103,12 @@ export interface Config {
   fallbackLocale: null;
   globals: {
     homepage: Homepage;
+    sections: Section;
     settings: Setting;
   };
   globalsSelect: {
     homepage: HomepageSelect<false> | HomepageSelect<true>;
+    sections: SectionsSelect<false> | SectionsSelect<true>;
     settings: SettingsSelect<false> | SettingsSelect<true>;
   };
   locale: null;
@@ -960,6 +962,157 @@ export interface Homepage {
   createdAt?: string | null;
 }
 /**
+ * Назва і текст угорі сторінок розділів.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "sections".
+ */
+export interface Section {
+  id: number;
+  news?: {
+    /**
+     * Заголовок на сторінці, у «хлібних крихтах» і в назві вкладки. Якщо порожньо — «Новини». Пункт меню не змінюється.
+     */
+    title?: string | null;
+    /**
+     * Показується під назвою, над фільтрами і списком матеріалів. Можна залишити порожнім.
+     */
+    text?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+    /**
+     * До 160 символів. Якщо порожньо — пошуковик візьме текст зі сторінки сам.
+     */
+    seoDescription?: string | null;
+  };
+  publication?: {
+    /**
+     * Заголовок на сторінці, у «хлібних крихтах» і в назві вкладки. Якщо порожньо — «Публікації». Пункт меню не змінюється.
+     */
+    title?: string | null;
+    /**
+     * Показується під назвою, над фільтрами і списком матеріалів. Можна залишити порожнім.
+     */
+    text?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+    /**
+     * До 160 символів. Якщо порожньо — пошуковик візьме текст зі сторінки сам.
+     */
+    seoDescription?: string | null;
+  };
+  interview?: {
+    /**
+     * Заголовок на сторінці, у «хлібних крихтах» і в назві вкладки. Якщо порожньо — «Інтерв’ю». Пункт меню не змінюється.
+     */
+    title?: string | null;
+    /**
+     * Показується під назвою, над фільтрами і списком матеріалів. Можна залишити порожнім.
+     */
+    text?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+    /**
+     * До 160 символів. Якщо порожньо — пошуковик візьме текст зі сторінки сам.
+     */
+    seoDescription?: string | null;
+  };
+  special?: {
+    /**
+     * Заголовок на сторінці, у «хлібних крихтах» і в назві вкладки. Якщо порожньо — «Спецпроєкти». Пункт меню не змінюється.
+     */
+    title?: string | null;
+    /**
+     * Показується під назвою, над фільтрами і списком матеріалів. Можна залишити порожнім.
+     */
+    text?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+    /**
+     * До 160 символів. Якщо порожньо — пошуковик візьме текст зі сторінки сам.
+     */
+    seoDescription?: string | null;
+  };
+  partner?: {
+    /**
+     * Заголовок на сторінці, у «хлібних крихтах» і в назві вкладки. Якщо порожньо — «Партнерські матеріали». Пункт меню не змінюється.
+     */
+    title?: string | null;
+    /**
+     * Показується під назвою, над фільтрами і списком матеріалів. Можна залишити порожнім.
+     */
+    text?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+    /**
+     * До 160 символів. Якщо порожньо — пошуковик візьме текст зі сторінки сам.
+     */
+    seoDescription?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "settings".
  */
@@ -991,6 +1144,50 @@ export interface HomepageSelect<T extends boolean = true> {
   pinnedInterviews?: T;
   pinnedSpecials?: T;
   popular?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "sections_select".
+ */
+export interface SectionsSelect<T extends boolean = true> {
+  news?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+        seoDescription?: T;
+      };
+  publication?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+        seoDescription?: T;
+      };
+  interview?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+        seoDescription?: T;
+      };
+  special?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+        seoDescription?: T;
+      };
+  partner?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+        seoDescription?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

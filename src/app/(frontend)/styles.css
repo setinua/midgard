@@ -156,6 +156,9 @@ figcaption { font: 400 13px/18px var(--sans); color: var(--ink-600); margin-top:
 /* Lists page */
 .h1p { font: 700 38px/44px var(--sans); letter-spacing: -0.015em; margin: 0 0 8px; }
 .intro { font: 400 17px/27px var(--sans); color: var(--ink-600); margin: 0 0 20px; max-width: 68ch; }
+.intro .prose { font: inherit; color: inherit; }
+.intro .prose p { margin: 0 0 12px; }
+.intro .prose > :last-child { margin-bottom: 0; }
 .filters { display: flex; flex-wrap: wrap; gap: 16px 24px; align-items: flex-end; padding: 16px; background: var(--surface-2); border-radius: 4px; margin-bottom: 24px; }
 .filters label { display: flex; flex-direction: column; gap: 6px; font: 500 13px var(--sans); color: var(--ink-600); }
 .filters select, .filters input { height: 40px; min-width: 200px; border: 1px solid var(--line); border-radius: 4px; padding: 0 10px; font: 400 15px var(--sans); background: #fff; }
