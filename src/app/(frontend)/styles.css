@@ -87,7 +87,10 @@ a:hover { color: var(--blue-600); }
 @media (min-width: 1280px) {
   .t1.balanced .x-extra { display: list-item; }
   .t1.balanced > .t1-side { contain: size; display: flex; flex-direction: column; min-height: 0; }
-  .t1.balanced .fill { flex: 1 1 auto; min-height: 0; overflow: hidden; }
+  .t1.balanced .fill { flex: 1 1 auto; min-height: 0; overflow: hidden; display: flex; flex-direction: column; }
+  /* leftover space under the last whole item is spread evenly between items, so the last one ends on the line */
+  .t1.balanced .fill > ul { flex: 1 0 auto; display: flex; flex-direction: column; justify-content: space-between; }
+  .t1.balanced .fill li { flex-shrink: 0; }
 }
 .t2 { display: grid; grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr)); gap: 32px; }
 .pt { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 32px; }
