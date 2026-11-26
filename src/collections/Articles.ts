@@ -64,6 +64,7 @@ export const Articles: CollectionConfig = {
               hasMany: true,
               maxRows: 4,
               label: '«Читайте також» (вручну, до 4)',
+              filterOptions: ({ id }) => (id ? { id: { not_equals: id } } : true),
               admin: { description: 'Ручний вибір показується першим. Решту місць (до 4) сайт добирає сам: спершу та сама епоха, потім той самий регіон, потім найновіші.' },
             },
           ],
