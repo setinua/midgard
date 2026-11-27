@@ -1,7 +1,7 @@
 import { payload as getPayload } from '../../../lib/data'
 import { UserError, ownArticle, setCover } from '../../../lib/connector/articles'
 import { MAX_IMAGE_BYTES } from '../../../lib/connector/images'
-import { clientIp, privateHeaders, rateLimited, readBody, verifyUpload } from '../../../lib/connector/security'
+import { clientIp, connectorOff, privateHeaders, rateLimited, readBody, verifyUpload } from '../../../lib/connector/security'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
@@ -27,13 +27,18 @@ const page = (body: string, status = 200) =>
     },
   )
 
+// curl and scripts (no text/html in Accept) get short JSON instead of the page.
+const wantsJson = (req: Request) => !(req.headers.get('accept') || '').includes('text/html')
+const jsonReply = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { ...privateHeaders, 'Content-Type': 'application/json' } })
+
 const expired = () =>
   page(`<h1>Посилання не діє</h1><p class="err">Посилання застаріло (діє 24 години) або неправильне. Попросіть у Claude нове: «Дай посилання для завантаження фото до новини про …».</p>`, 404)
 
 async function context(req: Request, token: string) {
   if (rateLimited(`foto:${clientIp(req)}`, 60, 10 * 60 * 1000)) return { error: page('<h1>Забагато спроб</h1><p class="err">Зачекайте 10 хвилин.</p>', 429) }
+  if (connectorOff()) return { error: new Response('Not found', { status: 404, headers: privateHeaders }) }
   const t = verifyUpload(token)
-  if (!t) return { error: expired() }
+  if (!t) return { error: wantsJson(req) ? jsonReply({ error: 'link_expired', hint: 'Посилання застаріло або неправильне: get_photo_upload_link' }, 404) : expired() }
   const payload = await getPayload()
   let user: any
   try {
@@ -73,24 +78,34 @@ export async function POST(req: Request, ctx: { params: Promise<{ token: string 
   const c = await context(req, token)
   if ('error' in c) return c.error
   const raw = await readBody(req, MAX_IMAGE_BYTES + 64 * 1024)
-  if (!raw) return page('<h1>Фото завелике</h1><p class="err">Потрібно до 20 МБ.</p><p><a href="">Назад</a></p>', 413)
+  if (!raw) return wantsJson(req) ? jsonReply({ error: 'too_large', hint: 'Фото до 20 МБ' }, 413) : page('<h1>Фото завелике</h1><p class="err">Потрібно до 20 МБ.</p><p><a href="">Назад</a></p>', 413)
   try {
     const form = await new Request(req.url, { method: 'POST', headers: req.headers, body: new Uint8Array(raw) }).formData()
     const file = form.get('file')
-    if (!(file instanceof File) || !file.size) throw new UserError('Виберіть фото')
-    if (file.size > MAX_IMAGE_BYTES) throw new UserError('Фото більше за 20 МБ')
+    if (!(file instanceof File) || !file.size) throw new UserError('missing_field', 'Виберіть фото', { field: 'file' })
+    if (file.size > MAX_IMAGE_BYTES) throw new UserError('too_large', 'Фото більше за 20 МБ')
     const buf = Buffer.from(await file.arrayBuffer())
-    const { live } = await setCover(c.payload, c.user, c.article.id, buf, {
-      alt: String(form.get('alt') || ''),
-      credit: String(form.get('credit') || ''),
-      caption: String(form.get('caption') || '') || undefined,
-      license: String(form.get('license') || '') || undefined,
-    })
+    // The link itself was issued only after confirm_published for a published article.
+    const { live, media, width, height } = await setCover(
+      c.payload,
+      c.user,
+      c.article.id,
+      buf,
+      {
+        alt: String(form.get('alt') || ''),
+        credit: String(form.get('credit') || ''),
+        caption: String(form.get('caption') || '') || undefined,
+        license: String(form.get('license') || '') || undefined,
+      },
+      true,
+    )
     c.payload.logger.info({ connectorUser: c.user.email, action: 'cover-upload', article: c.article.id }, 'connector')
+    if (wantsJson(req)) return jsonReply({ ok: true, id: c.article.id, media_id: media.id, size: `${width}×${height}`, live })
     return page(`<h1>Готово</h1><p class="ok">Фото стало обкладинкою матеріалу «${esc(c.article.title)}».${live ? ' Матеріал опублікований — фото вже на сайті.' : ''}</p><p class="muted">Можна закрити цю сторінку або завантажити інше фото <a href="">тут</a>.</p>`)
   } catch (e: any) {
     const msg = e instanceof UserError || /^(Фото|Це не фото|Підходять|Потрібні)/.test(String(e?.message)) ? e.message : 'Не вдалося зберегти фото. Спробуйте ще раз.'
     if (!(e instanceof UserError)) c.payload.logger.warn({ err: e, connectorUser: c.user.email }, 'connector upload failed')
+    if (wantsJson(req)) return jsonReply({ error: e instanceof UserError ? e.code : 'image_error', hint: msg }, 400)
     return page(`<h1>Не вийшло</h1><p class="err">${esc(msg)}</p><p><a href="">Спробувати ще раз</a></p>`, 400)
   }
 }

@@ -1,6 +1,9 @@
 import { createHash, createHmac, randomBytes, timingSafeEqual } from 'crypto'
 import type { Payload } from 'payload'
 
+/** Kill switch: CONNECTOR_DISABLED=1 in Railway variables closes /mcp and /foto for everyone. */
+export const connectorOff = () => /^(1|true|yes)$/i.test(process.env.CONNECTOR_DISABLED || '')
+
 // Connector secret: 32 random bytes in the URL; only its SHA-256 is used for lookup.
 export const newConnectorToken = () => randomBytes(32).toString('base64url')
 export const hashToken = (t: string) => createHash('sha256').update(t).digest('hex')
