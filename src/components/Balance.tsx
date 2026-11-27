@@ -13,11 +13,15 @@ export function Balance() {
         const items = [...f.querySelectorAll<HTMLElement>('li')]
         items.forEach((li) => (li.style.display = ''))
         const limit = f.getBoundingClientRect().bottom + 1
-        for (let i = items.length - 1; i > 0; i--) {
+        f.classList.add('loose') // measure packed
+        let last: HTMLElement | null = null
+        for (let i = items.length - 1; i >= 0; i--) {
           if (items[i].offsetParent === null) continue // x-extra hidden on narrow screens
-          if (items[i].getBoundingClientRect().bottom <= limit) break
+          if (i === 0 || items[i].getBoundingClientRect().bottom <= limit) { last = items[i]; break }
           items[i].style.display = 'none'
         }
+        // Too few materials to fill the column: keep them packed at the top instead of spreading wide gaps.
+        if (!last || limit - last.getBoundingClientRect().bottom <= 140) f.classList.remove('loose')
       })
     }
     run()

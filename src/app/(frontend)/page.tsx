@@ -23,9 +23,9 @@ export default async function Home() {
         <article className="c-lead lead-card">
           <SectionHead title="Текст дня" />
           {lead ? (
-            <Link href={href(lead)} style={{ display: 'block' }}>
+            <Link href={href(lead)} className="lead-link">
               <Img media={img(lead.hero)} size="lead" className="lead-img" sizes="(max-width: 767px) 100vw, 600px" priority />
-              {kicker && <div className="kicker" style={{ margin: '18px 0 8px' }}>{kicker}</div>}
+              {kicker && <div className="kicker lead-kicker">{kicker}</div>}
               <h2 className="lc-title">{lead.title}</h2>
               <p className="lc-lead">{lead.lead}</p>
               <div className="meta">{metaLine(lead)}</div>
@@ -34,7 +34,7 @@ export default async function Home() {
             <Empty>Редактор ще не обрав «Текст дня».</Empty>
           )}
           {h.popular.length > 0 && (
-            <div style={{ marginTop: 32 }}>
+            <div className="lead-pop">
               <SectionHead title="Популярні" />
               <ThumbList items={h.popular} size={96} small={false} />
             </div>

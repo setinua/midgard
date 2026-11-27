@@ -91,6 +91,7 @@ a:hover { color: var(--blue-600); }
   /* leftover space under the last whole item is spread evenly between items, so the last one ends on the line */
   .t1.balanced .fill > ul { flex: 1 0 auto; display: flex; flex-direction: column; justify-content: space-between; }
   .t1.balanced .fill li { flex-shrink: 0; }
+  .t1.balanced .fill.loose > ul { justify-content: flex-start; }
 }
 .t2 { display: grid; grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr)); gap: 32px; }
 .pt { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 32px; }
@@ -121,6 +122,17 @@ a:hover { color: var(--blue-600); }
 .lead-card .lc-title { font: 700 30px/36px var(--sans); letter-spacing: -0.015em; margin: 0 0 12px; }
 .lead-card .lc-lead { font: 400 17px/27px var(--sans); color: var(--ink-600); margin: 0 0 14px; }
 .lead-img { aspect-ratio: 16 / 10; width: 100%; object-fit: cover; background: #cbbba0; }
+.lead-link { display: block; }
+.lead-kicker { margin: 18px 0 8px; }
+.lead-pop { margin-top: 32px; }
+/* Tablet / narrow desktop window: the lead spans the full row, so photo left + text right instead of a screen-high photo */
+@media (min-width: 768px) and (max-width: 1279px) {
+  .lead-link { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); grid-template-rows: auto auto auto auto 1fr; column-gap: 24px; }
+  .lead-link > * { grid-column: 2; }
+  .lead-link > .lead-img { grid-column: 1; grid-row: 1 / -1; }
+  .lead-kicker { margin-top: 0; }
+  .lead-pop ul { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 32px; }
+}
 .empty { color: var(--ink-500); font-size: 14px; padding: 12px 0; }
 
 /* Article */
