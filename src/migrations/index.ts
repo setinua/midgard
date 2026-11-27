@@ -4,6 +4,7 @@ import * as migration_20261123_120538_media_license_optional from './20261123_12
 import * as migration_20261124_190000_slug_whole_words from './20261124_190000_slug_whole_words';
 import * as migration_20261126_200224_sections_global from './20261126_200224_sections_global';
 import * as migration_20261126_203000_clear_auto_related from './20261126_203000_clear_auto_related';
+import * as migration_20261127_190000_claude_connector from './20261127_190000_claude_connector';
 
 export const migrations = [
   {
@@ -35,5 +36,10 @@ export const migrations = [
     up: migration_20261126_203000_clear_auto_related.up,
     down: migration_20261126_203000_clear_auto_related.down,
     name: '20261126_203000_clear_auto_related',
+  },
+  {
+    up: migration_20261127_190000_claude_connector.up,
+    down: migration_20261127_190000_claude_connector.down,
+    name: '20261127_190000_claude_connector',
   },
 ];

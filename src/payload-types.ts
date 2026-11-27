@@ -377,6 +377,16 @@ export interface User {
    * Щоб нові матеріали автоматично підписувались цим автором.
    */
   author?: (number | null) | Author;
+  /**
+   * Вимкнення одразу зупиняє посилання. Права — як у ролі користувача, але лише власні матеріали; нові завжди чернетками. Для журналіста ставте роль «Автор».
+   */
+  connectorEnabled?: boolean | null;
+  connectorRegenerate?: boolean | null;
+  /**
+   * З’явиться після збереження. Журналіст вставляє його в Claude: Customize → Connectors → Add custom connector.
+   */
+  connectorUrl?: string | null;
+  connectorTokenHash?: string | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -844,6 +854,10 @@ export interface UsersSelect<T extends boolean = true> {
   name?: T;
   role?: T;
   author?: T;
+  connectorEnabled?: T;
+  connectorRegenerate?: T;
+  connectorUrl?: T;
+  connectorTokenHash?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;

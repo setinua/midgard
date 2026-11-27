@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { adminFieldOnly, isAdmin, isLoggedIn } from '../access'
+import { connectorUrl, hashToken, newConnectorToken } from '../lib/connector/security'
 
 export const Users: CollectionConfig = {
   slug: 'users',
@@ -8,11 +9,20 @@ export const Users: CollectionConfig = {
   hooks: {
     // The very first account (created on /admin/create-first-user) is always an administrator.
     beforeChange: [
-      async ({ data, operation, req }) => {
+      async ({ data, operation, req, originalDoc }) => {
         if (operation === 'create') {
           const { totalDocs } = await req.payload.count({ collection: 'users', req })
           if (totalDocs === 0) data.role = 'admin'
         }
+        // Claude connector: a new secret link when the admin asks for one (or turns it on the first time).
+        // Field access keeps these values admin-only, so other users cannot set them.
+        const first = data.connectorEnabled && !data.connectorTokenHash && !originalDoc?.connectorTokenHash
+        if (data.connectorRegenerate || first) {
+          const token = newConnectorToken()
+          data.connectorTokenHash = hashToken(token)
+          data.connectorUrl = connectorUrl(token)
+        }
+        data.connectorRegenerate = false
         return data
       },
     ],
@@ -46,6 +56,42 @@ export const Users: CollectionConfig = {
       relationTo: 'authors',
       label: 'Профіль автора на сайті',
       admin: { description: 'Щоб нові матеріали автоматично підписувались цим автором.' },
+    },
+    {
+      type: 'collapsible',
+      label: 'Конектор Claude (журналіст)',
+      admin: { initCollapsed: true, condition: (_, __, { user }) => (user as any)?.role === 'admin' },
+      fields: [
+        {
+          name: 'connectorEnabled',
+          type: 'checkbox',
+          label: 'Дозволити додавати матеріали через Claude',
+          defaultValue: false,
+          access: { read: adminFieldOnly, create: adminFieldOnly, update: adminFieldOnly },
+          admin: { description: 'Вимкнення одразу зупиняє посилання. Права — як у ролі користувача, але лише власні матеріали; нові завжди чернетками. Для журналіста ставте роль «Автор».' },
+        },
+        {
+          name: 'connectorRegenerate',
+          type: 'checkbox',
+          label: 'Створити нове посилання (старе перестане діяти)',
+          defaultValue: false,
+          access: { read: adminFieldOnly, create: adminFieldOnly, update: adminFieldOnly },
+        },
+        {
+          name: 'connectorUrl',
+          type: 'text',
+          label: 'Посилання для Claude (секретне — передавати лише цьому журналісту)',
+          access: { read: adminFieldOnly, create: adminFieldOnly, update: adminFieldOnly },
+          admin: { readOnly: true, description: 'З’явиться після збереження. Журналіст вставляє його в Claude: Customize → Connectors → Add custom connector.' },
+        },
+        {
+          name: 'connectorTokenHash',
+          type: 'text',
+          index: true,
+          access: { read: () => false, create: adminFieldOnly, update: adminFieldOnly },
+          admin: { hidden: true },
+        },
+      ],
     },
   ],
 }

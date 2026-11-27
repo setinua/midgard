@@ -122,13 +122,15 @@ export const Articles: CollectionConfig = {
   ],
   hooks: {
     beforeChange: [
-      ({ data, req, operation }) => {
+      ({ data, req, operation, originalDoc, context }) => {
         const user: any = req.user
         if (operation === 'create' && user) {
           data.createdBy = user.id
           if ((!data.authors || data.authors.length === 0) && user.author) data.authors = [typeof user.author === 'object' ? user.author.id : user.author]
         }
-        if (user?.role === 'author' && data._status === 'published') {
+        // Exception: the Claude connector saving the journalist's own already-published article (stays published).
+        const connectorLiveEdit = context?.connectorLiveEdit === true && operation === 'update' && originalDoc?._status === 'published'
+        if (user?.role === 'author' && data._status === 'published' && !connectorLiveEdit) {
           throw new APIError('Автор не може публікувати. Збережіть чернетку — опублікує редактор.', 403)
         }
         data.searchText = [data.title, data.lead, lexicalToText(data.content)].filter(Boolean).join('\n').slice(0, 20000)
