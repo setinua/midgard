@@ -21,5 +21,6 @@ export function proxy(req: NextRequest) {
   return res
 }
 
+// Photos (/api/media/file/) skip the proxy: public anyway, served faster and cached by Cloudflare.
 // /mcp/<secret>, /foto/<signed link> and the connector's OAuth endpoints have their own checks and headers (lib/connector).
-export const config = { matcher: ['/((?!_next/static|_next/image|favicon.ico|healthz$|\\.well-known/oauth|\\.well-known/openid|register$|oauth/|mcp/[^/]+$|foto/[^/]+$).*)'] }
+export const config = { matcher: ['/((?!_next/static|_next/image|api/media/file/|favicon.ico|healthz$|\\.well-known/oauth|\\.well-known/openid|register$|oauth/|mcp/[^/]+$|foto/[^/]+$).*)'] }

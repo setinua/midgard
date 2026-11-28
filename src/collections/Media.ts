@@ -17,6 +17,11 @@ export const Media: CollectionConfig = {
       { name: 'og', width: 1200, height: 630, formatOptions: { format: 'jpeg', options: { quality: 82 } } },
     ],
     adminThumbnail: 'thumb',
+    // Photos never change under the same name: let browsers and Cloudflare keep them long (speed, LCP).
+    modifyResponseHeaders: ({ headers }) => {
+      headers.set('Cache-Control', 'public, max-age=2592000, s-maxage=31536000, stale-while-revalidate=86400')
+      return headers
+    },
   },
   fields: [
     { name: 'alt', type: 'text', required: true, label: 'Альтернативний текст (що зображено)' },
