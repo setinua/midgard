@@ -24,4 +24,4 @@ export function proxy(req: NextRequest) {
 }
 
 // /mcp/<secret> and /foto/<signed link> have their own secret-link check and headers (lib/connector).
-export const config = { matcher: ['/((?!_next/static|_next/image|favicon.ico|mcp/[^/]+$|foto/[^/]+$).*)'] }
+export const config = { matcher: ['/((?!_next/static|_next/image|favicon.ico|healthz$|mcp/[^/]+$|foto/[^/]+$).*)'] }

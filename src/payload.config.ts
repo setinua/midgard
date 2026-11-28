@@ -33,6 +33,8 @@ export default buildConfig({
     user: Users.slug,
     meta: { titleSuffix: ' — Мідгард' },
     importMap: { baseDir: path.resolve(dirname) },
+    // Banner "site updated — reload" in admin tabs opened before a redeploy.
+    components: { providers: ['/components/admin/UpdateNotice#UpdateNotice'] },
   },
   i18n: { supportedLanguages: { uk }, fallbackLanguage: 'uk' },
   // Users are left out: they never appear on the public site.
