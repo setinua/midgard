@@ -9,7 +9,7 @@ import { Prose } from '../../../../components/Prose'
 import { SITE_NAME, SITE_URL, typeByPath } from '../../../../lib/constants'
 import { authorNames, getArticle, getRelated, getSidebar, href, img, rel, type Author, type Epoch, type Region, type Tag } from '../../../../lib/data'
 import { date, dateTime } from '../../../../lib/format'
-import { DEFAULT_OG, DESC_MAX, fitDesc, pageMeta } from '../../../../lib/seo'
+import { DEFAULT_OG, DESC_MAX, fitDesc, ogImage, pageMeta } from '../../../../lib/seo'
 
 type Props = { params: Promise<{ section: string; slug: string }> }
 
@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!r) return {}
   const { a, t } = r
   const hero = img(a.hero)
-  const og = hero?.sizes?.og?.url ? { url: hero.sizes.og.url, width: 1200, height: 630, alt: hero.alt } : null
+  const og = ogImage(hero, a.title)
   const tags = (a.tags || []).map((x) => rel<Tag>(x)?.name).filter(Boolean) as string[]
   const authors = (a.authors || []).map((x) => rel<Author>(x)).filter(Boolean) as Author[]
   const desc = a.seo?.description || a.lead
@@ -68,7 +68,7 @@ export default async function ArticlePage({ params }: Props) {
     description: a.lead,
     datePublished: a.publishedAt,
     dateModified: a.contentUpdatedAt || a.updatedAt,
-    image: [hero?.sizes?.lead?.url, hero?.sizes?.og?.url].filter(Boolean).length ? [hero?.sizes?.lead?.url, hero?.sizes?.og?.url].filter(Boolean) : [DEFAULT_OG.url],
+    image: hero ? [ogImage(hero)?.url, hero.sizes?.lead?.url ? `${SITE_URL}${hero.sizes.lead.url}`.replace(`${SITE_URL}http`, 'http') : null].filter(Boolean) : [DEFAULT_OG.url],
     articleSection: t.label,
     keywords: tags.map((x) => x.name).join(', ') || undefined,
     author: authors.length ? authors.map((x) => ({ '@type': 'Person', name: x.name, url: `${SITE_URL}/avtor/${x.slug}` })) : { '@type': 'Organization', name: SITE_NAME },

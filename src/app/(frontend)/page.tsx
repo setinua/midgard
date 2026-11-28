@@ -11,7 +11,9 @@ import { HOME_DESC, HOME_TITLE, pageMeta } from '../../lib/seo'
 
 export async function generateMetadata(): Promise<Metadata> {
   const s = await getSettings()
-  return pageMeta({ title: HOME_TITLE, absoluteTitle: true, description: s.description || HOME_DESC, path: '/' })
+  // The site description doubles as the footer text; a short one is not used for Google.
+  const own = (s.description || '').trim()
+  return pageMeta({ title: HOME_TITLE, absoluteTitle: true, description: own.length >= 120 ? own : HOME_DESC, path: '/' })
 }
 
 export default async function Home() {

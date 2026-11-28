@@ -109,3 +109,12 @@ export const NOINDEX_PAGES = ['polityka-konfidentsiinosti']
 export const HOME_TITLE = `${SITE_NAME} — новини археології України та світу`
 export const HOME_DESC =
   'Новини археології, відкриття, розкопки й інтерв’ю з дослідниками. Достовірно, з посиланнями на наукові джерела — без конспірології і «чорних копачів».'
+
+type MediaLike = { id?: number | string; url?: string | null; alt?: string | null; sizes?: { og?: { url?: string | null } | null } | null } | null | undefined
+
+/** Social image for a photo: its generated "og" size, or a 1200×630 JPEG made on demand (/og/<id>.jpg). */
+export const ogImage = (m: MediaLike, alt?: string | null) => {
+  if (!m?.url || m.id == null) return null
+  const url = m.sizes?.og?.url || `${SITE_URL}/og/${m.id}.jpg`
+  return { url: url.startsWith('http') ? url : `${SITE_URL}${url}`, width: 1200, height: 630, alt: m.alt || alt || null }
+}
