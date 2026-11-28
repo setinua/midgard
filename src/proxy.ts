@@ -2,8 +2,6 @@ import { NextResponse, type NextRequest } from 'next/server'
 
 // Optional closed mode: whole site behind HTTP Basic Auth when SITE_PASSWORD is set; SITE_NOINDEX=1 forbids indexing.
 export function proxy(req: NextRequest) {
-  // The Claude connector has no OAuth: answer discovery with 404 (not Basic Auth 401), so Claude connects without a login.
-  if (req.nextUrl.pathname.startsWith('/.well-known/oauth')) return new NextResponse('Not found', { status: 404 })
   // One address for readers and search engines: www → main domain (301).
   const canonical = (process.env.SERVER_URL || '').replace(/^https?:\/\//, '').replace(/\/.*$/, '')
   const host = (req.headers.get('x-forwarded-host') || req.headers.get('host') || '').split(':')[0].toLowerCase()
@@ -23,5 +21,5 @@ export function proxy(req: NextRequest) {
   return res
 }
 
-// /mcp/<secret> and /foto/<signed link> have their own secret-link check and headers (lib/connector).
-export const config = { matcher: ['/((?!_next/static|_next/image|favicon.ico|healthz$|mcp/[^/]+$|foto/[^/]+$).*)'] }
+// /mcp/<secret>, /foto/<signed link> and the connector's OAuth endpoints have their own checks and headers (lib/connector).
+export const config = { matcher: ['/((?!_next/static|_next/image|favicon.ico|healthz$|\\.well-known/oauth|\\.well-known/openid|register$|oauth/|mcp/[^/]+$|foto/[^/]+$).*)'] }
