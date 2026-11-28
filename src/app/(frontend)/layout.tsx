@@ -16,6 +16,7 @@ import { Footer } from '../../components/Footer'
 import { Header } from '../../components/Header'
 import { SITE_NAME, SITE_URL } from '../../lib/constants'
 import { DEFAULT_OG, HOME_TITLE } from '../../lib/seo'
+import { verificationCodes } from '../../lib/verification'
 import { getAds, getSettings, getTaxonomy } from '../../lib/data'
 
 export const dynamic = 'force-dynamic'
@@ -31,6 +32,11 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: { siteName: SITE_NAME, locale: 'uk_UA', type: 'website', images: [DEFAULT_OG] },
     twitter: { card: 'summary_large_image', images: [DEFAULT_OG.url] },
     icons: { icon: [{ url: '/favicon.svg?v=2', type: 'image/svg+xml' }, { url: '/favicon.ico?v=2', sizes: '48x48' }], apple: '/apple-touch-icon.png?v=2' },
+    // Search Console / Bing Webmaster ownership codes from «Налаштування».
+    verification: {
+      google: verificationCodes(s.googleVerification),
+      other: verificationCodes(s.bingVerification) ? { 'msvalidate.01': verificationCodes(s.bingVerification)! } : undefined,
+    },
     // AdSense site ownership (with public/ads.txt).
     other: ads?.adsenseClient ? { 'google-adsense-account': ads.adsenseClient.trim() } : undefined,
     robots: closed ? { index: false, follow: false } : { index: true, follow: true, 'max-image-preview': 'large' },

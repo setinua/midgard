@@ -1178,7 +1178,18 @@ export interface Setting {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Google Analytics → Адміністрування → Потоки даних → midgard.news → «Ідентифікатор потоку» (G-…). Порожньо — аналітики немає.
+   */
   gaId?: string | null;
+  /**
+   * Search Console → Додати ресурс → «Префікс URL» https://midgard.news → спосіб «Тег HTML»: вставте тег <meta …> повністю або лише значення content. Кілька кодів — кожен з нового рядка. Після підтвердження не видаляйте, інакше доступ до Search Console злетить.
+   */
+  googleVerification?: string | null;
+  /**
+   * Bing Webmaster Tools → спосіб «HTML Meta Tag» (msvalidate.01): вставте тег повністю або лише значення content. Можна також просто імпортувати сайт із Google Search Console — тоді код не потрібен.
+   */
+  bingVerification?: string | null;
   editorialEmail?: string | null;
   copyright?: string | null;
   updatedAt?: string | null;
@@ -1343,6 +1354,8 @@ export interface SettingsSelect<T extends boolean = true> {
         id?: T;
       };
   gaId?: T;
+  googleVerification?: T;
+  bingVerification?: T;
   editorialEmail?: T;
   copyright?: T;
   updatedAt?: T;
