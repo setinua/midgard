@@ -63,6 +63,28 @@ export const findArticles = cached('findArticles', async (opts: {
   return { docs: res.docs as Card[], totalPages: res.totalPages, totalDocs: res.totalDocs }
 })
 
+/** Number of live articles matching the filter (cached): used for the SEO content threshold. */
+export const countArticles = cached('countArticles', async (where: Where[]): Promise<number> => {
+  const p = await payload()
+  const res = await p.count({ collection: 'articles', where: { and: [live(), ...where] } })
+  return res.totalDocs
+})
+
+/** Live article counts per region, epoch and tag (cached), for the sitemap threshold. */
+export const taxonomyCounts = cached('taxonomyCounts', async () => {
+  const p = await payload()
+  const res = await p.find({ collection: 'articles', where: live(), limit: 0, pagination: false, depth: 0, select: { primaryRegion: true, regions: true, primaryEpoch: true, epochs: true, tags: true } })
+  const count = { regions: {} as Record<number, number>, epochs: {} as Record<number, number>, tags: {} as Record<number, number> }
+  const id = (x: unknown) => (typeof x === 'object' && x ? (x as { id: number }).id : (x as number))
+  for (const a of res.docs as Article[]) {
+    const add = (bucket: Record<number, number>, ids: unknown[]) => new Set(ids.filter(Boolean).map(id)).forEach((i) => (bucket[i] = (bucket[i] || 0) + 1))
+    add(count.regions, [a.primaryRegion, ...(a.regions || [])])
+    add(count.epochs, [a.primaryEpoch, ...(a.epochs || [])])
+    add(count.tags, a.tags || [])
+  }
+  return count
+})
+
 // Keeps only published, already-live picks from a manual list, in editor order.
 const livePicks = (list: unknown[] | null | undefined): Card[] => {
   const now = Date.now()

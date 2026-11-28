@@ -9,6 +9,7 @@ import { Prose } from '../../../../components/Prose'
 import { SITE_NAME, SITE_URL, typeByPath } from '../../../../lib/constants'
 import { authorNames, getArticle, getRelated, getSidebar, href, img, rel, type Author, type Epoch, type Region, type Tag } from '../../../../lib/data'
 import { date, dateTime } from '../../../../lib/format'
+import { DEFAULT_OG, DESC_MAX, fitDesc, pageMeta } from '../../../../lib/seo'
 
 type Props = { params: Promise<{ section: string; slug: string }> }
 
@@ -23,16 +24,26 @@ async function load(p: Props['params']) {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const r = await load(params)
   if (!r) return {}
-  const { a } = r
+  const { a, t } = r
   const hero = img(a.hero)
-  const og = hero?.sizes?.og?.url || hero?.url
-  return {
+  const og = hero?.sizes?.og?.url ? { url: hero.sizes.og.url, width: 1200, height: 630, alt: hero.alt } : null
+  const tags = (a.tags || []).map((x) => rel<Tag>(x)?.name).filter(Boolean) as string[]
+  const authors = (a.authors || []).map((x) => rel<Author>(x)).filter(Boolean) as Author[]
+  const desc = a.seo?.description || a.lead
+  return pageMeta({
     title: a.seo?.title || a.title,
-    description: a.seo?.description || a.lead,
-    alternates: { canonical: `${SITE_URL}${href(a)}` },
-    openGraph: { type: 'article', title: a.title, description: a.lead, publishedTime: a.publishedAt, images: og ? [{ url: og, width: 1200, height: 630 }] : undefined },
-    twitter: { card: 'summary_large_image' },
-  }
+    description: a.type === 'partner' && !a.seo?.description ? `${fitDesc(desc, DESC_MAX - 26) || ''} Партнерський матеріал.` : desc,
+    path: href(a),
+    image: og,
+    type: 'article',
+    article: {
+      publishedTime: a.publishedAt,
+      modifiedTime: a.contentUpdatedAt || a.updatedAt,
+      section: t.label,
+      tags,
+      authors: authors.map((x) => `${SITE_URL}/avtor/${x.slug}`),
+    },
+  })
 }
 
 export default async function ArticlePage({ params }: Props) {
@@ -57,9 +68,11 @@ export default async function ArticlePage({ params }: Props) {
     description: a.lead,
     datePublished: a.publishedAt,
     dateModified: a.contentUpdatedAt || a.updatedAt,
-    image: hero?.sizes?.og?.url || hero?.url ? [hero?.sizes?.og?.url || hero?.url] : undefined,
+    image: [hero?.sizes?.lead?.url, hero?.sizes?.og?.url].filter(Boolean).length ? [hero?.sizes?.lead?.url, hero?.sizes?.og?.url].filter(Boolean) : [DEFAULT_OG.url],
+    articleSection: t.label,
+    keywords: tags.map((x) => x.name).join(', ') || undefined,
     author: authors.length ? authors.map((x) => ({ '@type': 'Person', name: x.name, url: `${SITE_URL}/avtor/${x.slug}` })) : { '@type': 'Organization', name: SITE_NAME },
-    publisher: { '@type': 'NewsMediaOrganization', name: SITE_NAME, url: SITE_URL },
+    publisher: { '@type': 'NewsMediaOrganization', name: SITE_NAME, url: SITE_URL, logo: { '@type': 'ImageObject', url: `${SITE_URL}/logo.png` } },
     mainEntityOfPage: url,
     isAccessibleForFree: true,
   }
@@ -118,7 +131,7 @@ export default async function ArticlePage({ params }: Props) {
           <figcaption>{[hero.caption, hero.credit && `Фото: ${hero.credit}`].filter(Boolean).join('. ')}</figcaption>
         </figure>
       )}
-      <Prose data={a.content} />
+      <Prose data={a.content} sponsored={a.type === 'partner'} />
       {a.sources && a.sources.length > 0 && (
         <aside className="sources" aria-labelledby="sources-h">
           <h2 id="sources-h" className="sources-h">{a.sources.length > 1 ? 'Джерела' : 'Джерело'}</h2>

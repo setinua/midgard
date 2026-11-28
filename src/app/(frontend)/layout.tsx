@@ -14,7 +14,8 @@ import Script from 'next/script'
 import React from 'react'
 import { Footer } from '../../components/Footer'
 import { Header } from '../../components/Header'
-import { SITE_NAME, SITE_TAGLINE, SITE_URL } from '../../lib/constants'
+import { SITE_NAME, SITE_URL } from '../../lib/constants'
+import { DEFAULT_OG, HOME_TITLE } from '../../lib/seo'
 import { getSettings, getTaxonomy } from '../../lib/data'
 
 export const dynamic = 'force-dynamic'
@@ -24,10 +25,11 @@ export async function generateMetadata(): Promise<Metadata> {
   const closed = process.env.SITE_NOINDEX === '1'
   return {
     metadataBase: new URL(SITE_URL),
-    title: { default: `${SITE_NAME} — ${SITE_TAGLINE.toLowerCase()}`, template: `%s — ${SITE_NAME}` },
+    title: { default: HOME_TITLE, template: `%s | ${SITE_NAME}` },
     description: s.description || undefined,
     alternates: { types: { 'application/rss+xml': `${SITE_URL}/rss.xml` } },
-    openGraph: { siteName: SITE_NAME, locale: 'uk_UA', type: 'website' },
+    openGraph: { siteName: SITE_NAME, locale: 'uk_UA', type: 'website', images: [DEFAULT_OG] },
+    twitter: { card: 'summary_large_image', images: [DEFAULT_OG.url] },
     icons: { icon: [{ url: '/favicon.svg?v=2', type: 'image/svg+xml' }, { url: '/favicon.ico?v=2', sizes: '48x48' }], apple: '/apple-touch-icon.png?v=2' },
     robots: closed ? { index: false, follow: false } : { index: true, follow: true, 'max-image-preview': 'large' },
   }
@@ -43,6 +45,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     logo: `${SITE_URL}/logo.png`,
     sameAs: (s.social || []).map((x) => x.url),
   }
+  const site = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: SITE_NAME,
+    alternateName: 'Midgard.news',
+    url: SITE_URL,
+    inLanguage: 'uk',
+    potentialAction: { '@type': 'SearchAction', target: `${SITE_URL}/poshuk?q={search_term_string}`, 'query-input': 'required name=search_term_string' },
+  }
   return (
     <html lang="uk">
       <body>
@@ -52,7 +63,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <Header regions={regions} epochs={epochs} social={(s.social || []) as { network: string; url: string }[]} />
         <main id="main">{children}</main>
         <Footer description={s.description} copyright={s.copyright} />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(org) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify([org, site]) }} />
         {s.gaId && process.env.SITE_NOINDEX !== '1' && (
           <>
             <Script src={`https://www.googletagmanager.com/gtag/js?id=${s.gaId}`} strategy="afterInteractive" />

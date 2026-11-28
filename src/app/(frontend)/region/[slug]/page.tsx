@@ -1,15 +1,16 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { Crumbs, ListPage, pageNoindex, type SP } from '../../../../components/ListPage'
-import { SITE_URL } from '../../../../lib/constants'
-import { bySlug } from '../../../../lib/data'
+import { bySlug, countArticles } from '../../../../lib/data'
+import { MIN_ITEMS, pageMeta, regionDesc, regionTitle } from '../../../../lib/seo'
 
 type Props = { params: Promise<{ slug: string }>; searchParams: Promise<SP> }
 
 export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
   const r = await bySlug('regions', (await params).slug)
   if (!r) return {}
-  return { title: r.seo?.title || r.name, description: r.seo?.description || r.description || undefined, alternates: { canonical: `${SITE_URL}/region/${r.slug}` }, robots: pageNoindex(await searchParams) ? { index: false, follow: true } : undefined }
+  const n = await countArticles([{ or: [{ primaryRegion: { equals: r.id } }, { regions: { in: [r.id] } }] }])
+  return pageMeta({ title: r.seo?.title || regionTitle(r.slug, r.name), description: r.seo?.description || r.description || regionDesc(r.slug, r.name), path: `/region/${r.slug}`, noindex: n < MIN_ITEMS || pageNoindex(await searchParams) })
 }
 
 export default async function RegionPage({ params, searchParams }: Props) {

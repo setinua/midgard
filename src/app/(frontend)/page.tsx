@@ -5,6 +5,14 @@ import { Balance } from '../../components/Balance'
 import { Img } from '../../components/Img'
 import { getHomepage, href, img, rel, type Epoch, type Region } from '../../lib/data'
 import { smart } from '../../lib/format'
+import type { Metadata } from 'next'
+import { getSettings } from '../../lib/data'
+import { HOME_DESC, HOME_TITLE, pageMeta } from '../../lib/seo'
+
+export async function generateMetadata(): Promise<Metadata> {
+  const s = await getSettings()
+  return pageMeta({ title: HOME_TITLE, absoluteTitle: true, description: s.description || HOME_DESC, path: '/' })
+}
 
 export default async function Home() {
   const h = await getHomepage()

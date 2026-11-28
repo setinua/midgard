@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { pageMeta } from '../../../../lib/seo'
 import { notFound } from 'next/navigation'
 import { Img } from '../../../../components/Img'
 import { Crumbs, ListPage, type SP } from '../../../../components/ListPage'
@@ -9,7 +10,9 @@ type Props = { params: Promise<{ slug: string }>; searchParams: Promise<SP> }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const a = await bySlug('authors', (await params).slug)
-  return a ? { title: a.name, description: a.bio || a.expertise || undefined, alternates: { canonical: `${SITE_URL}/avtor/${a.slug}` } } : {}
+  if (!a) return {}
+  const photo = img(a.photo)
+  return pageMeta({ title: a.seo?.title || (a.expertise ? `${a.name} — ${a.expertise}` : a.name), description: a.seo?.description || a.bio || a.expertise, path: `/avtor/${a.slug}`, type: 'profile', image: photo?.sizes?.og?.url ? { url: photo.sizes.og.url, width: 1200, height: 630, alt: a.name } : null })
 }
 
 export default async function AuthorPage({ params, searchParams }: Props) {

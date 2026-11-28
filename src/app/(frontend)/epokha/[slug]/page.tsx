@@ -1,15 +1,16 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { Crumbs, ListPage, pageNoindex, type SP } from '../../../../components/ListPage'
-import { SITE_URL } from '../../../../lib/constants'
-import { bySlug } from '../../../../lib/data'
+import { bySlug, countArticles } from '../../../../lib/data'
+import { MIN_ITEMS, epochDesc, epochTitle, pageMeta } from '../../../../lib/seo'
 
 type Props = { params: Promise<{ slug: string }>; searchParams: Promise<SP> }
 
 export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
   const r = await bySlug('epochs', (await params).slug)
   if (!r) return {}
-  return { title: r.seo?.title || r.name, description: r.seo?.description || r.description || undefined, alternates: { canonical: `${SITE_URL}/epokha/${r.slug}` }, robots: pageNoindex(await searchParams) ? { index: false, follow: true } : undefined }
+  const n = await countArticles([{ or: [{ primaryEpoch: { equals: r.id } }, { epochs: { in: [r.id] } }] }])
+  return pageMeta({ title: r.seo?.title || epochTitle(r.name), description: r.seo?.description || r.description || epochDesc(r.name, r.period), path: `/epokha/${r.slug}`, noindex: n < MIN_ITEMS || pageNoindex(await searchParams) })
 }
 
 export default async function EpochPage({ params, searchParams }: Props) {

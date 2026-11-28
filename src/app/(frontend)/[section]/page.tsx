@@ -1,10 +1,11 @@
 import type { Metadata } from 'next'
+import { NOINDEX_PAGES, pageMeta, SECTION_TITLES } from '../../../lib/seo'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Img } from '../../../components/Img'
 import { Crumbs, ListPage, pageNoindex, type SP } from '../../../components/ListPage'
 import { Prose } from '../../../components/Prose'
-import { SITE_URL, typeByPath } from '../../../lib/constants'
+import { typeByPath } from '../../../lib/constants'
 import { bySlug, cached, getSections, img, payload, type Author } from '../../../lib/data'
 
 async function sectionInfo(t: { value: string; label: string }) {
@@ -26,10 +27,10 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   const t = typeByPath(section)
   if (t) {
     const s = await sectionInfo(t)
-    return { title: s.title, description: s.description, alternates: { canonical: `${SITE_URL}/${t.path}` }, robots: pageNoindex(sp) ? { index: false, follow: true } : undefined }
+    return pageMeta({ title: SECTION_TITLES[t.value] || s.title, description: s.description, path: `/${t.path}`, noindex: pageNoindex(sp) })
   }
   const p = await bySlug('pages', section)
-  return p ? { title: p.seo?.title || p.title, description: p.seo?.description || p.intro || undefined } : {}
+  return p ? pageMeta({ title: p.seo?.title || p.title, description: p.seo?.description || p.intro, path: `/${p.slug}`, noindex: NOINDEX_PAGES.includes(p.slug) }) : {}
 }
 
 export default async function Section({ params, searchParams }: Props) {

@@ -12,9 +12,29 @@ const internal = ({ linkNode }: any) => {
   return '#'
 }
 
-const converters: JSXConvertersFunction = ({ defaultConverters }) => ({
+const SITE_HOST = (process.env.SERVER_URL || '').replace(/^https?:\/\//, '').replace(/\/.*$/, '')
+const hostOf = (url: string) => url.replace(/^https?:\/\//i, '').split(/[/?#:]/)[0].toLowerCase().replace(/^www\./, '')
+const isExternal = (url: string) => /^https?:\/\//i.test(url) && hostOf(url) !== SITE_HOST.toLowerCase().replace(/^www\./, '')
+
+// Partner (advertising) materials: every external link in the text is marked rel="sponsored" (Google's rule for paid links).
+const sponsoredLinks = (): Partial<ReturnType<JSXConvertersFunction>> => {
+  const render = ({ node, nodesToJSX }: any) => {
+    const f = node.fields || {}
+    const url: string = f.linkType === 'internal' ? internal({ linkNode: node }) : f.url || '#'
+    const relAttr = [f.newTab ? 'noopener noreferrer' : '', isExternal(url) ? 'sponsored' : ''].filter(Boolean).join(' ') || undefined
+    return (
+      <a href={url} rel={relAttr} target={f.newTab ? '_blank' : undefined}>
+        {nodesToJSX({ nodes: node.children })}
+      </a>
+    )
+  }
+  return { link: render, autolink: render }
+}
+
+const make = (sponsored: boolean): JSXConvertersFunction => ({ defaultConverters }) => ({
   ...defaultConverters,
   ...LinkJSXConverter({ internalDocToHref: internal }),
+  ...(sponsored ? sponsoredLinks() : {}),
   blocks: {
     html: ({ node }: any) => (node.fields?.html ? <HtmlEmbed html={node.fields.html} /> : null),
   },
@@ -31,7 +51,10 @@ const converters: JSXConvertersFunction = ({ defaultConverters }) => ({
   },
 })
 
-export function Prose({ data }: { data: unknown }) {
+const plain = make(false)
+const partner = make(true)
+
+export function Prose({ data, sponsored = false }: { data: unknown; sponsored?: boolean }) {
   if (!data) return null
-  return <RichText data={data as SerializedEditorState} converters={converters} className="prose" />
+  return <RichText data={data as SerializedEditorState} converters={sponsored ? partner : plain} className="prose" />
 }

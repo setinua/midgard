@@ -21,8 +21,24 @@ export const seoFields: Field = {
   label: 'SEO',
   admin: { position: 'sidebar' },
   fields: [
-    { name: 'title', type: 'text', label: 'Title (якщо відрізняється від заголовка)' },
-    { name: 'description', type: 'textarea', label: 'Description (якщо порожньо — береться анотація)' },
+    {
+      name: 'title',
+      type: 'text',
+      label: 'SEO-заголовок (title)',
+      admin: {
+        description: 'Для Google: до 60 символів, головне слово на початку («де + що знайшли + епоха»). Порожньо — береться заголовок; « | Мідгард» додається, коли влазить.',
+        components: { afterInput: [{ path: '/components/admin/CharCount#CharCount', clientProps: { max: 60 } }] },
+      },
+    },
+    {
+      name: 'description',
+      type: 'textarea',
+      label: 'SEO-опис (description)',
+      admin: {
+        description: 'Закінчене речення 120–155 символів: хто, що, де, коли. Порожньо — береться анотація, обрізана по реченню.',
+        components: { afterInput: [{ path: '/components/admin/CharCount#CharCount', clientProps: { min: 120, max: 155 } }] },
+      },
+    },
   ],
 }
 
