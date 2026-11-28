@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 import { ARTICLE_TYPES, typeByValue } from '../lib/constants'
 import { findArticles, getTaxonomy, href, img, rel, type Epoch, type Region } from '../lib/data'
 import { date } from '../lib/format'
+import { AdSlot } from './Ad'
 import { AdLabel, Empty } from './Blocks'
 import { Img } from './Img'
 
@@ -21,6 +22,7 @@ export async function ListPage({
   crumbs,
   aside,
   before,
+  ads = true,
 }: {
   title: string
   intro?: ReactNode
@@ -31,6 +33,8 @@ export async function ListPage({
   crumbs?: ReactNode
   aside?: ReactNode
   before?: ReactNode
+  /** Banner places (off for search). */
+  ads?: boolean
 }) {
   const { regions, epochs } = await getTaxonomy()
   const page = Math.max(1, parseInt(one(sp.page)) || 1)
@@ -58,6 +62,7 @@ export async function ListPage({
       {crumbs}
       <h1 className="h1p">{title}</h1>
       {intro && <div className="intro">{intro}</div>}
+      {ads && <AdSlot slot="top" />}
       {before}
       {filters.length > 0 && (
         <form className="filters" method="get" action={base}>
@@ -92,10 +97,10 @@ export async function ListPage({
       <div className={aside ? 'ag' : ''}>
         <div>
           {res.docs.length === 0 && <Empty>Матеріалів поки немає.</Empty>}
-          {res.docs.map((a) => {
+          {res.docs.map((a, i) => {
             const t = typeByValue(a.type)
             const k = [rel<Epoch>(a.primaryEpoch)?.name, t?.single].filter(Boolean).join(' · ')
-            return (
+            const row = (
               <Link key={a.id} href={href(a)} className="row-item">
                 <Img media={img(a.hero)} size="card" className="row-thumb" sizes="(max-width: 767px) 112px, 240px" />
                 <span style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -106,6 +111,8 @@ export async function ListPage({
                 </span>
               </Link>
             )
+            // Banner 2: once, after the 6th material (only when more follow).
+            return ads && i === 5 && res.docs.length > 6 ? [row, <AdSlot key="ad-middle" slot="middle" />] : row
           })}
           {res.totalPages > 1 && (
             <nav className="pager" aria-label="Сторінки">
@@ -116,6 +123,7 @@ export async function ListPage({
               {page < res.totalPages && <Link href={qs(page + 1)} rel="next">Далі →</Link>}
             </nav>
           )}
+          {ads && res.docs.length > 0 && <AdSlot slot="bottom" />}
         </div>
         {aside}
       </div>

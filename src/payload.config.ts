@@ -14,6 +14,7 @@ import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
 import { Epochs, Regions, Tags } from './collections/Taxonomies'
 import { Users } from './collections/Users'
+import { Ads } from './globals/Ads'
 import { Homepage } from './globals/Homepage'
 import { Sections } from './globals/Sections'
 import { Settings } from './globals/Settings'
@@ -36,7 +37,7 @@ export default buildConfig({
   i18n: { supportedLanguages: { uk }, fallbackLanguage: 'uk' },
   // Users are left out: they never appear on the public site.
   collections: [...[Articles, Pages, Authors, Media, Regions, Epochs, Tags].map(purgeOnChange), Users],
-  globals: [Homepage, Sections, Settings].map(purgeOnGlobalChange),
+  globals: [Homepage, Sections, Settings, Ads].map(purgeOnGlobalChange),
   editor: lexicalEditor({
     // Always-visible toolbar above the text (bold, link, quote, lists, headings, upload)
     // H1 is the article title, so the body only gets H2–H4; rarely needed tools are removed.

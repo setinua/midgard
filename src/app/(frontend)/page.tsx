@@ -1,5 +1,6 @@
 import type React from 'react'
 import Link from 'next/link'
+import { AdSlot } from '../../components/Ad'
 import { AdLabel, Empty, NewsList, SectionHead, ThumbList, metaLine } from '../../components/Blocks'
 import { Balance } from '../../components/Balance'
 import { Img } from '../../components/Img'
@@ -57,6 +58,9 @@ export default async function Home() {
         <Balance />
       </section>
 
+      {/* Banner 1 goes under the first row, never on the first phone screen */}
+      <AdSlot slot="top" />
+
       {(() => {
         // Second tier: up to three sections; empty ones are hidden and the rest share the row.
         const blocks = (
@@ -78,6 +82,8 @@ export default async function Home() {
         ) : null
       })()}
 
+      <AdSlot slot="middle" />
+
       {h.partners.length > 0 && (
         <section>
           <SectionHead title="Партнерські матеріали" />
@@ -94,6 +100,8 @@ export default async function Home() {
           </div>
         </section>
       )}
+
+      <AdSlot slot="bottom" />
     </div>
   )
 }

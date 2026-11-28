@@ -105,11 +105,13 @@ export interface Config {
     homepage: Homepage;
     sections: Section;
     settings: Setting;
+    ads: Ad;
   };
   globalsSelect: {
     homepage: HomepageSelect<false> | HomepageSelect<true>;
     sections: SectionsSelect<false> | SectionsSelect<true>;
     settings: SettingsSelect<false> | SettingsSelect<true>;
+    ads: AdsSelect<false> | AdsSelect<true>;
   };
   locale: null;
   widgets: {
@@ -207,7 +209,13 @@ export interface Article {
    */
   byline?: string | null;
   seo?: {
+    /**
+     * Для Google: до 60 символів, головне слово на початку («де + що знайшли + епоха»). Порожньо — береться заголовок; « | Мідгард» додається, коли влазить.
+     */
     title?: string | null;
+    /**
+     * Закінчене речення 120–155 символів: хто, що, де, коли. Порожньо — береться анотація, обрізана по реченню.
+     */
     description?: string | null;
   };
   createdBy?: (number | null) | User;
@@ -289,7 +297,13 @@ export interface Region {
   order?: number | null;
   description?: string | null;
   seo?: {
+    /**
+     * Для Google: до 60 символів, головне слово на початку («де + що знайшли + епоха»). Порожньо — береться заголовок; « | Мідгард» додається, коли влазить.
+     */
     title?: string | null;
+    /**
+     * Закінчене речення 120–155 символів: хто, що, де, коли. Порожньо — береться анотація, обрізана по реченню.
+     */
     description?: string | null;
   };
   updatedAt: string;
@@ -310,7 +324,13 @@ export interface Epoch {
   period?: string | null;
   description?: string | null;
   seo?: {
+    /**
+     * Для Google: до 60 символів, головне слово на початку («де + що знайшли + епоха»). Порожньо — береться заголовок; « | Мідгард» додається, коли влазить.
+     */
     title?: string | null;
+    /**
+     * Закінчене речення 120–155 символів: хто, що, де, коли. Порожньо — береться анотація, обрізана по реченню.
+     */
     description?: string | null;
   };
   updatedAt: string;
@@ -329,7 +349,13 @@ export interface Tag {
   slug: string;
   order?: number | null;
   seo?: {
+    /**
+     * Для Google: до 60 символів, головне слово на початку («де + що знайшли + епоха»). Порожньо — береться заголовок; « | Мідгард» додається, коли влазить.
+     */
     title?: string | null;
+    /**
+     * Закінчене речення 120–155 символів: хто, що, де, коли. Порожньо — береться анотація, обрізана по реченню.
+     */
     description?: string | null;
   };
   updatedAt: string;
@@ -359,7 +385,13 @@ export interface Author {
     | null;
   inTeam?: boolean | null;
   seo?: {
+    /**
+     * Для Google: до 60 символів, головне слово на початку («де + що знайшли + епоха»). Порожньо — береться заголовок; « | Мідгард» додається, коли влазить.
+     */
     title?: string | null;
+    /**
+     * Закінчене речення 120–155 символів: хто, що, де, коли. Порожньо — береться анотація, обрізана по реченню.
+     */
     description?: string | null;
   };
   updatedAt: string;
@@ -435,7 +467,13 @@ export interface Page {
     [k: string]: unknown;
   } | null;
   seo?: {
+    /**
+     * Для Google: до 60 символів, головне слово на початку («де + що знайшли + епоха»). Порожньо — береться заголовок; « | Мідгард» додається, коли влазить.
+     */
     title?: string | null;
+    /**
+     * Закінчене речення 120–155 символів: хто, що, де, коли. Порожньо — береться анотація, обрізана по реченню.
+     */
     description?: string | null;
   };
   updatedAt: string;
@@ -1147,6 +1185,91 @@ export interface Setting {
   createdAt?: string | null;
 }
 /**
+ * Три банерні місця, однакові на всіх сторінках з рекламою (головна, матеріали, списки). Немає реклами в пошуку, на сторінках сайту (контакти, політики), у партнерських матеріалах. Вимкнене місце нічого не показує й не займає місця. Над кожним банером — позначка «Реклама».
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ads".
+ */
+export interface Ad {
+  id: number;
+  /**
+   * Головний вимикач: вимкнено — жодних банерів і скрипта AdSense.
+   */
+  enabled?: boolean | null;
+  /**
+   * ca-pub-… — той самий, що в ads.txt. Скрипт AdSense вантажиться лише на сторінках з рекламою.
+   */
+  adsenseClient?: string | null;
+  /**
+   * Головна — під першим рядом (не на першому екрані телефона). Матеріал — під заголовком, лідом і автором. Списки (розділ, епоха, регіон, тег, автор, архів) — під заголовком. Комп’ютер 970×90, телефон 320×100.
+   */
+  top?: {
+    active?: boolean | null;
+    advertiser?: string | null;
+    kind?: ('adsense' | 'code' | 'image') | null;
+    /**
+     * AdSense → Реклама → За рекламним блоком → «Медійний» блок (адаптивний) → у коді блоку число з data-ad-slot, напр. 1234567890.
+     */
+    adSlot?: string | null;
+    /**
+     * Код блоку так, як його дає мережа.
+     */
+    code?: string | null;
+    image?: (number | null) | Media;
+    mobileImage?: (number | null) | Media;
+    url?: string | null;
+    alt?: string | null;
+    startsAt?: string | null;
+    endsAt?: string | null;
+  };
+  /**
+   * Матеріал — у тексті після 3-го абзацу (лише якщо абзаців 6+). Списки — після 6-го матеріалу. Головна — під «Публікаціями / Інтерв’ю / Спецпроєктами». Комп’ютер 300×250, телефон 300×250.
+   */
+  middle?: {
+    active?: boolean | null;
+    advertiser?: string | null;
+    kind?: ('adsense' | 'code' | 'image') | null;
+    /**
+     * AdSense → Реклама → За рекламним блоком → «Медійний» блок (адаптивний) → у коді блоку число з data-ad-slot, напр. 1234567890.
+     */
+    adSlot?: string | null;
+    /**
+     * Код блоку так, як його дає мережа.
+     */
+    code?: string | null;
+    image?: (number | null) | Media;
+    mobileImage?: (number | null) | Media;
+    url?: string | null;
+    alt?: string | null;
+    startsAt?: string | null;
+    endsAt?: string | null;
+  };
+  /**
+   * Одразу після тексту матеріалу і джерел (перед тегами й «Читайте також»); у списках і на головній — унизу. Комп’ютер 728×90, телефон 300×250.
+   */
+  bottom?: {
+    active?: boolean | null;
+    advertiser?: string | null;
+    kind?: ('adsense' | 'code' | 'image') | null;
+    /**
+     * AdSense → Реклама → За рекламним блоком → «Медійний» блок (адаптивний) → у коді блоку число з data-ad-slot, напр. 1234567890.
+     */
+    adSlot?: string | null;
+    /**
+     * Код блоку так, як його дає мережа.
+     */
+    code?: string | null;
+    image?: (number | null) | Media;
+    mobileImage?: (number | null) | Media;
+    url?: string | null;
+    alt?: string | null;
+    startsAt?: string | null;
+    endsAt?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "homepage_select".
  */
@@ -1222,6 +1345,62 @@ export interface SettingsSelect<T extends boolean = true> {
   gaId?: T;
   editorialEmail?: T;
   copyright?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ads_select".
+ */
+export interface AdsSelect<T extends boolean = true> {
+  enabled?: T;
+  adsenseClient?: T;
+  top?:
+    | T
+    | {
+        active?: T;
+        advertiser?: T;
+        kind?: T;
+        adSlot?: T;
+        code?: T;
+        image?: T;
+        mobileImage?: T;
+        url?: T;
+        alt?: T;
+        startsAt?: T;
+        endsAt?: T;
+      };
+  middle?:
+    | T
+    | {
+        active?: T;
+        advertiser?: T;
+        kind?: T;
+        adSlot?: T;
+        code?: T;
+        image?: T;
+        mobileImage?: T;
+        url?: T;
+        alt?: T;
+        startsAt?: T;
+        endsAt?: T;
+      };
+  bottom?:
+    | T
+    | {
+        active?: T;
+        advertiser?: T;
+        kind?: T;
+        adSlot?: T;
+        code?: T;
+        image?: T;
+        mobileImage?: T;
+        url?: T;
+        alt?: T;
+        startsAt?: T;
+        endsAt?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

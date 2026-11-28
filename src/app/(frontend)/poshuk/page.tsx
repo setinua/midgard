@@ -32,6 +32,7 @@ export default async function Search({ searchParams }: Props) {
       base="/poshuk"
       sp={sp}
       before={form}
+      ads={false}
       where={words.map((w) => ({ searchText: { like: w } }))}
       filters={['region', 'epokha', 'typ']}
       crumbs={<Crumbs items={[['Головна', '/'], ['Пошук']]} />}

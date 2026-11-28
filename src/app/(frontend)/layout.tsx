@@ -16,12 +16,12 @@ import { Footer } from '../../components/Footer'
 import { Header } from '../../components/Header'
 import { SITE_NAME, SITE_URL } from '../../lib/constants'
 import { DEFAULT_OG, HOME_TITLE } from '../../lib/seo'
-import { getSettings, getTaxonomy } from '../../lib/data'
+import { getAds, getSettings, getTaxonomy } from '../../lib/data'
 
 export const dynamic = 'force-dynamic'
 
 export async function generateMetadata(): Promise<Metadata> {
-  const s = await getSettings()
+  const [s, ads] = await Promise.all([getSettings(), getAds()])
   const closed = process.env.SITE_NOINDEX === '1'
   return {
     metadataBase: new URL(SITE_URL),
@@ -31,6 +31,8 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: { siteName: SITE_NAME, locale: 'uk_UA', type: 'website', images: [DEFAULT_OG] },
     twitter: { card: 'summary_large_image', images: [DEFAULT_OG.url] },
     icons: { icon: [{ url: '/favicon.svg?v=2', type: 'image/svg+xml' }, { url: '/favicon.ico?v=2', sizes: '48x48' }], apple: '/apple-touch-icon.png?v=2' },
+    // AdSense site ownership (with public/ads.txt).
+    other: ads?.adsenseClient ? { 'google-adsense-account': ads.adsenseClient.trim() } : undefined,
     robots: closed ? { index: false, follow: false } : { index: true, follow: true, 'max-image-preview': 'large' },
   }
 }

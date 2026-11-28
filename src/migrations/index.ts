@@ -5,6 +5,7 @@ import * as migration_20261124_190000_slug_whole_words from './20261124_190000_s
 import * as migration_20261126_200224_sections_global from './20261126_200224_sections_global';
 import * as migration_20261126_203000_clear_auto_related from './20261126_203000_clear_auto_related';
 import * as migration_20261127_190000_claude_connector from './20261127_190000_claude_connector';
+import * as migration_20261128_091124_banners from './20261128_091124_banners';
 
 export const migrations = [
   {
@@ -41,5 +42,10 @@ export const migrations = [
     up: migration_20261127_190000_claude_connector.up,
     down: migration_20261127_190000_claude_connector.down,
     name: '20261127_190000_claude_connector',
+  },
+  {
+    up: migration_20261128_091124_banners.up,
+    down: migration_20261128_091124_banners.down,
+    name: '20261128_091124_banners'
   },
 ];

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { AdSlot } from '../../../../components/Ad'
 import { AdLabel, NewsList, SectionHead, ThumbList } from '../../../../components/Blocks'
 import { EditButton } from '../../../../components/EditButton'
 import { Icon } from '../../../../components/Icons'
@@ -60,6 +61,8 @@ export default async function ArticlePage({ params }: Props) {
   const [related, side] = await Promise.all([getRelated(a), getSidebar(a.id)])
   const url = `${SITE_URL}${href(a)}`
   const special = a.type === 'special'
+  // No banners inside partner (advertising) materials.
+  const ads = a.type !== 'partner'
 
   const ld = {
     '@context': 'https://schema.org',
@@ -119,6 +122,7 @@ export default async function ArticlePage({ params }: Props) {
           <a href="https://www.facebook.com/mchaikovskiy" target="_blank" rel="noopener" aria-label="Мідгард у Facebook"><Icon.facebook /></a>
         </div>
       </div>
+      {ads && <AdSlot slot="top" />}
       {a.type === 'interview' && a.interviewee?.name && (
         <div className="person">
           <Img media={img(a.interviewee.photo)} size="thumb" className="av-48" sizes="48px" />
@@ -131,7 +135,7 @@ export default async function ArticlePage({ params }: Props) {
           <figcaption>{[hero.caption, hero.credit && `Фото: ${hero.credit}`].filter(Boolean).join('. ')}</figcaption>
         </figure>
       )}
-      <Prose data={a.content} sponsored={a.type === 'partner'} />
+      <Prose data={a.content} sponsored={a.type === 'partner'} middle={ads ? <AdSlot slot="middle" className="adslot--intext" /> : undefined} />
       {a.sources && a.sources.length > 0 && (
         <aside className="sources" aria-labelledby="sources-h">
           <h2 id="sources-h" className="sources-h">{a.sources.length > 1 ? 'Джерела' : 'Джерело'}</h2>
@@ -150,6 +154,7 @@ export default async function ArticlePage({ params }: Props) {
           </ul>
         </aside>
       )}
+      {ads && <AdSlot slot="bottom" />}
       {(tags.length > 0 || extraRegions.length > 0 || extraEpochs.length > 0) && (
         <div className="chips">
           <span style={{ color: 'var(--ink-600)' }}>Теги:</span>

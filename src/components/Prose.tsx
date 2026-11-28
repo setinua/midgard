@@ -1,5 +1,6 @@
 import { LinkJSXConverter, RichText, type JSXConvertersFunction } from '@payloadcms/richtext-lexical/react'
 import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical'
+import type { ReactNode } from 'react'
 import { typeByValue } from '../lib/constants'
 import { HtmlEmbed } from './HtmlEmbed'
 
@@ -54,7 +55,27 @@ const make = (sponsored: boolean): JSXConvertersFunction => ({ defaultConverters
 const plain = make(false)
 const partner = make(true)
 
-export function Prose({ data, sponsored = false }: { data: unknown; sponsored?: boolean }) {
+/** Top-level text paragraphs (not empty ones) — banner 2 goes after the 3rd, only when there are 6 or more. */
+const MID_AFTER = 3
+const MID_MIN = 6
+const isPara = (n: any) => n?.type === 'paragraph' && Array.isArray(n.children) && n.children.length > 0
+
+export function Prose({ data, sponsored = false, middle }: { data: unknown; sponsored?: boolean; middle?: ReactNode }) {
   if (!data) return null
-  return <RichText data={data as SerializedEditorState} converters={sponsored ? partner : plain} className="prose" />
+  const converters = sponsored ? partner : plain
+  const state = data as SerializedEditorState
+  const nodes = (state.root?.children || []) as any[]
+  if (middle && nodes.filter(isPara).length >= MID_MIN) {
+    let seen = 0
+    const cut = nodes.findIndex((n) => isPara(n) && ++seen === MID_AFTER) + 1
+    const part = (children: any[]) => ({ ...state, root: { ...state.root, children } }) as SerializedEditorState
+    return (
+      <>
+        <RichText data={part(nodes.slice(0, cut))} converters={converters} className="prose" />
+        {middle}
+        <RichText data={part(nodes.slice(cut))} converters={converters} className="prose" />
+      </>
+    )
+  }
+  return <RichText data={state} converters={converters} className="prose" />
 }

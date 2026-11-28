@@ -198,6 +198,8 @@ export const getSections = cache(cached('sections', async () => (await payload()
 
 export const getSettings = cache(cached('settings', async () => (await payload()).findGlobal({ slug: 'settings', depth: 0 })))
 
+export const getAds = cache(cached('ads', async () => (await payload()).findGlobal({ slug: 'ads', depth: 1 })))
+
 async function queryBySlug<T extends 'regions' | 'epochs' | 'tags' | 'authors' | 'pages'>(collection: T, slug: string) {
   const p = await payload()
   const res = await p.find({ collection, where: { slug: { equals: slug } }, limit: 1, depth: 1 })
