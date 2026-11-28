@@ -42,7 +42,7 @@ export function Header({ regions, epochs, social }: { regions: Item[]; epochs: I
                 const I = Icon[s.network as keyof typeof Icon] || Icon.link
                 return <a key={s.url} href={s.url} aria-label={s.network} rel="noopener" target="_blank"><I /></a>
               })}
-              <a href="/rss.xml" aria-label="RSS"><Icon.rss /></a>
+              <Link href="/rss" aria-label="RSS"><Icon.rss /></Link>
             </div>
           </div>
           <div className="brand-row">

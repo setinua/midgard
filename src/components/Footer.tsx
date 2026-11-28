@@ -15,7 +15,7 @@ export function Footer({ description, copyright }: { description?: string | null
           <Link href="/pro-proiekt">Про проєкт</Link><Link href="/komanda">Команда</Link><Link href="/kontakty">Контакти</Link><Link href="/redaktsiina-polityka">Редакційна політика</Link><Link href="/pidtrymaty">Підтримати</Link>
         </nav>
         <nav aria-label="Інше">
-          <Link href="/polityka-konfidentsiinosti">Політика конфіденційності</Link><Link href="/reklama">Реклама на сайті</Link><a href="/rss.xml">RSS</a>
+          <Link href="/polityka-konfidentsiinosti">Політика конфіденційності</Link><Link href="/reklama">Реклама на сайті</Link><Link href="/rss">RSS</Link>
         </nav>
       </div>
       <div className="wrap foot-copy">© {new Date().getFullYear()} «Мідгард». {copyright}</div>
