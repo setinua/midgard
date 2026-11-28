@@ -1,14 +1,13 @@
 import { NextResponse, type NextRequest } from 'next/server'
 
-// Test stage: whole site behind HTTP Basic Auth when SITE_PASSWORD is set, and never indexed.
+// Optional closed mode: whole site behind HTTP Basic Auth when SITE_PASSWORD is set; SITE_NOINDEX=1 forbids indexing.
 export function proxy(req: NextRequest) {
   // The Claude connector has no OAuth: answer discovery with 404 (not Basic Auth 401), so Claude connects without a login.
   if (req.nextUrl.pathname.startsWith('/.well-known/oauth')) return new NextResponse('Not found', { status: 404 })
-  // One address for readers and search engines: www and the old test address → main domain (301).
+  // One address for readers and search engines: www → main domain (301).
   const canonical = (process.env.SERVER_URL || '').replace(/^https?:\/\//, '').replace(/\/.*$/, '')
   const host = (req.headers.get('x-forwarded-host') || req.headers.get('host') || '').split(':')[0].toLowerCase()
-  const oldHosts = (process.env.REDIRECT_HOSTS || 'midgard.set.in.ua').split(',').map((h) => h.trim().toLowerCase()).filter(Boolean)
-  if (canonical && host && host !== canonical && (host === `www.${canonical}` || oldHosts.includes(host))) {
+  if (canonical && host === `www.${canonical}`) {
     return NextResponse.redirect(`https://${canonical}${req.nextUrl.pathname}${req.nextUrl.search}`, 301)
   }
   const pass = process.env.SITE_PASSWORD
